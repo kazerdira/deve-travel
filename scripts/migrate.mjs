@@ -3,6 +3,10 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import postgres from 'postgres';
 
+// Plain node scripts don't read .env (only the Astro dev server does), so load
+// it here. Requires Node 20.12+; real environment variables take precedence.
+try { process.loadEnvFile(join(dirname(fileURLToPath(import.meta.url)), '..', '.env')); } catch { /* no .env — rely on the environment */ }
+
 const url = process.env.DATABASE_URL;
 if (!url) { console.error('DATABASE_URL not set — nothing to migrate.'); process.exit(1); }
 const sql = postgres(url);
