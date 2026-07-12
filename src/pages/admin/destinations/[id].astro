@@ -1,0 +1,14 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import DestinationForm from '../../../components/admin/DestinationForm.astro';
+import { destinationById, listServicesRaw } from '../../../lib/admin';
+export const prerender = false;
+const destination = await destinationById(Astro.params.id!);
+if (!destination) return Astro.redirect('/admin/destinations', 302);
+const allServices = await listServicesRaw();
+---
+<Admin title={`Destination · ${destination.title_fr}`} active="destinations">
+  <h1>Modifier : {destination.flag} {destination.title_fr}</h1>
+  <p style="margin-block-end:1rem"><a href={`/destinations/${destination.id}`} target="_blank">Voir la page publique ↗</a></p>
+  <DestinationForm destination={destination} allServices={allServices} />
+</Admin>

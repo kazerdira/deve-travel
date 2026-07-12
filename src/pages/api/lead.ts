@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { getSql } from '../../lib/db';
 import { notifyLead } from '../../lib/notify';
+import { createLimiter } from '../../lib/ratelimit';
 import { SITE } from '../../consts';
 import { createHash } from 'node:crypto';
 
@@ -15,6 +16,7 @@ const schema = z.object({
   service: z.string().max(40).optional().or(z.literal('')),
   audience: z.enum(['student', 'worker', 'pr']).optional().or(z.literal('')),
   message: z.string().max(2000).optional().or(z.literal('')),
+  offer_slug: z.string().max(60).optional().or(z.literal('')),
   locale: z.enum(['fr', 'ar']).default('fr'),
   page_path: z.string().max(300).optional(),
   source: z.string().max(300).optional(),
@@ -25,15 +27,7 @@ const clean = (v?: string) => (v && v.trim() ? v.trim() : undefined);
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
-// naive in-memory rate limit (per process). Good enough for a small marketing site.
-const hits = new Map<string, { n: number; t: number }>();
-function limited(ipHash: string): boolean {
-  const now = Date.now();
-  const rec = hits.get(ipHash);
-  if (!rec || now - rec.t > 3600_000) { hits.set(ipHash, { n: 1, t: now }); return false; }
-  rec.n += 1;
-  return rec.n > 6;
-}
+const limited = createLimiter(6, 3600_000);
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   let data: unknown;
@@ -56,23 +50,27 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     service: clean(d.service),
     audience: clean(d.audience),
     message: clean(d.message),
+    offer_slug: clean(d.offer_slug),
     locale: d.locale,
     page_path: clean(d.page_path),
     source: clean(d.source),
   };
 
   const sql = getSql();
+  let leadId: number | undefined;
   try {
     if (sql) {
-      await sql`
-        INSERT INTO leads (name, phone, email, destination, service, audience, message, locale, source, page_path, ip_hash, user_agent)
+      const [row] = await sql`
+        INSERT INTO leads (name, phone, email, destination, service, audience, message, offer_slug, locale, source, page_path, ip_hash, user_agent)
         VALUES (${lead.name}, ${lead.phone}, ${lead.email ?? null}, ${lead.destination ?? null},
-                ${lead.service ?? null}, ${lead.audience ?? null}, ${lead.message ?? null},
+                ${lead.service ?? null}, ${lead.audience ?? null}, ${lead.message ?? null}, ${lead.offer_slug ?? null},
                 ${lead.locale}, ${lead.source ?? null}, ${lead.page_path ?? null}, ${ipHash},
-                ${request.headers.get('user-agent') ?? null})`;
+                ${request.headers.get('user-agent') ?? null})
+        RETURNING id`;
+      leadId = Number(row.id);
       await sql`
-        INSERT INTO events (kind, destination, service, locale, page_path, source)
-        VALUES ('form_submit', ${lead.destination ?? null}, ${lead.service ?? null}, ${lead.locale}, ${lead.page_path ?? null}, ${lead.source ?? null})`;
+        INSERT INTO events (kind, destination, service, offer_slug, locale, page_path, source)
+        VALUES ('form_submit', ${lead.destination ?? null}, ${lead.service ?? null}, ${lead.offer_slug ?? null}, ${lead.locale}, ${lead.page_path ?? null}, ${lead.source ?? null})`;
     } else {
       // Dev / no-DB mode: log so the site is fully usable without Postgres.
       console.log('[lead:dev]', JSON.stringify(lead));
@@ -82,6 +80,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // fall through — still try to notify so no lead is lost
   }
 
-  await notifyLead(lead, SITE.name);
+  await notifyLead(lead, SITE.name, leadId);
   return json({ ok: true });
 };

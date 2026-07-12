@@ -1,0 +1,90 @@
+---
+import UploadField from './UploadField.astro';
+import { icons } from '../../lib/icons';
+interface Props { service?: any; }
+const { service: s = null } = Astro.props;
+const iconKeys = Object.keys(icons);
+---
+<form class="admin-form" method="post" action="/api/admin/services">
+  <input type="hidden" name="_action" value={s ? 'update' : 'create'} />
+  {s && <input type="hidden" name="id" value={s.id} />}
+
+  <div class="row three">
+    <div class="field">
+      <label for="s-slug">Slug (URL)</label>
+      {s
+        ? <input id="s-slug" type="text" value={s.id} disabled />
+        : <input id="s-slug" name="slug" type="text" required pattern="[a-z0-9-]+" placeholder="assurance-voyage" />}
+      <small>minuscules, chiffres, tirets — définitif après création</small>
+    </div>
+    <div class="field">
+      <label for="s-order">Ordre d’affichage</label>
+      <input id="s-order" name="sort_order" type="number" value={s?.sort_order ?? 100} />
+    </div>
+    <div class="field">
+      <label for="s-icon">Icône de secours</label>
+      <select id="s-icon" name="icon">
+        {iconKeys.map((k) => <option value={k} selected={(s?.icon ?? 'file-check') === k}>{k}</option>)}
+      </select>
+      <small>utilisée si aucune image 3D n’est définie</small>
+    </div>
+  </div>
+
+  <div class="row two">
+    <div class="field--check">
+      <input id="s-avail" name="available" type="checkbox" checked={s ? s.available : true} />
+      <label for="s-avail">Disponible (visible sur le site)</label>
+    </div>
+    <div class="field--check">
+      <input id="s-global" name="is_global" type="checkbox" checked={s?.is_global} />
+      <label for="s-global">Global (proposé pour toutes les destinations)</label>
+    </div>
+  </div>
+
+  <UploadField name="icon_image" label="Icône 3D (PNG transparent)" value={s?.icon_image} hint="png, max 4 Mo" />
+
+  <fieldset>
+    <legend>Contenu</legend>
+    <div class="row two">
+      <div class="field"><label for="s-tfr">Titre (FR)</label><input id="s-tfr" name="title_fr" type="text" required value={s?.title_fr ?? ''} /></div>
+      <div class="field"><label for="s-tar">Titre (arabe — facultatif)</label><input id="s-tar" name="title_ar" type="text" dir="rtl" value={s?.title_ar ?? ''} /></div>
+    </div>
+    <div class="row two">
+      <div class="field"><label for="s-gfr">Tagline (FR)</label><input id="s-gfr" name="tagline_fr" type="text" required value={s?.tagline_fr ?? ''} /></div>
+      <div class="field"><label for="s-gar">Tagline (arabe — facultatif)</label><input id="s-gar" name="tagline_ar" type="text" dir="rtl" value={s?.tagline_ar ?? ''} /></div>
+    </div>
+    <div class="row two">
+      <div class="field"><label for="s-sfr">Résumé (FR)</label><textarea id="s-sfr" name="summary_fr" required rows="4">{s?.summary_fr ?? ''}</textarea></div>
+      <div class="field"><label for="s-sar">Résumé (arabe — facultatif)</label><textarea id="s-sar" name="summary_ar" dir="rtl" rows="4">{s?.summary_ar ?? ''}</textarea></div>
+    </div>
+    <div class="row two">
+      <div class="field"><label for="s-ifr">Ce qui est inclus (FR — un point par ligne)</label><textarea id="s-ifr" name="includes_fr" rows="5">{(s?.includes_fr ?? []).join('\n')}</textarea></div>
+      <div class="field"><label for="s-iar">Ce qui est inclus (arabe — facultatif, un point par ligne)</label><textarea id="s-iar" name="includes_ar" dir="rtl" rows="5">{(s?.includes_ar ?? []).join('\n')}</textarea></div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>WhatsApp</legend>
+    <div class="row two">
+      <div class="field"><label for="s-wfr">Message prérempli (FR)</label><textarea id="s-wfr" name="whatsapp_fr" rows="2">{s?.whatsapp_fr ?? ''}</textarea></div>
+      <div class="field"><label for="s-war">Message prérempli (arabe — facultatif)</label><textarea id="s-war" name="whatsapp_ar" dir="rtl" rows="2">{s?.whatsapp_ar ?? ''}</textarea></div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>SEO (facultatif)</legend>
+    <div class="row two">
+      <div class="field"><label for="s-stfr">Titre SEO (FR)</label><input id="s-stfr" name="seo_title_fr" type="text" value={s?.seo_title_fr ?? ''} /></div>
+      <div class="field"><label for="s-star">Titre SEO (arabe)</label><input id="s-star" name="seo_title_ar" type="text" dir="rtl" value={s?.seo_title_ar ?? ''} /></div>
+    </div>
+    <div class="row two">
+      <div class="field"><label for="s-sdfr">Description SEO (FR)</label><input id="s-sdfr" name="seo_desc_fr" type="text" value={s?.seo_desc_fr ?? ''} /></div>
+      <div class="field"><label for="s-sdar">Description SEO (arabe)</label><input id="s-sdar" name="seo_desc_ar" type="text" dir="rtl" value={s?.seo_desc_ar ?? ''} /></div>
+    </div>
+  </fieldset>
+
+  <div class="admin-actions">
+    <button class="btn btn--sun" type="submit">{s ? 'Enregistrer' : 'Créer le service'}</button>
+    <a class="btn btn--ghost" href="/admin/services">Annuler</a>
+  </div>
+</form>

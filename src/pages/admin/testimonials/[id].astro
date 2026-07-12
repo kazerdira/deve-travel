@@ -1,0 +1,14 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import TestimonialForm from '../../../components/admin/TestimonialForm.astro';
+import { testimonialById, listDestinationsRaw } from '../../../lib/admin';
+export const prerender = false;
+const id = Number(Astro.params.id);
+const testimonial = Number.isInteger(id) ? await testimonialById(id) : null;
+if (!testimonial) return Astro.redirect('/admin/testimonials', 302);
+const destinations = await listDestinationsRaw();
+---
+<Admin title={`Témoignage · ${testimonial.name}`} active="testimonials">
+  <h1>Modifier : {testimonial.name}</h1>
+  <TestimonialForm testimonial={testimonial} destinations={destinations} />
+</Admin>

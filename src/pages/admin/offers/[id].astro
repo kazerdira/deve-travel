@@ -1,0 +1,15 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import OfferForm from '../../../components/admin/OfferForm.astro';
+import { offerById, listDestinationsRaw } from '../../../lib/admin';
+export const prerender = false;
+const id = Number(Astro.params.id);
+const offer = Number.isInteger(id) ? await offerById(id) : null;
+if (!offer) return Astro.redirect('/admin/offers', 302);
+const destinations = await listDestinationsRaw();
+---
+<Admin title={`Offre · ${offer.title_fr}`} active="offers">
+  <h1>Modifier : {offer.flag} {offer.title_fr}</h1>
+  <p style="margin-block-end:1rem"><a href={`/offres/${offer.slug}`} target="_blank">Voir la page publique ↗</a></p>
+  <OfferForm offer={offer} destinations={destinations} />
+</Admin>

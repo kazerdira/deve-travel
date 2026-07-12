@@ -1,0 +1,106 @@
+---
+import UploadField from './UploadField.astro';
+interface Props { offer?: any; destinations: any[]; }
+const { offer: o = null, destinations } = Astro.props;
+// datetime-local wants "YYYY-MM-DDTHH:MM" without timezone
+const dtLocal = (d: Date | null) => {
+  if (!d) return '';
+  const x = new Date(d);
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${x.getFullYear()}-${p(x.getMonth() + 1)}-${p(x.getDate())}T${p(x.getHours())}:${p(x.getMinutes())}`;
+};
+---
+<form class="admin-form" method="post" action="/api/admin/offers">
+  <input type="hidden" name="_action" value={o ? 'update' : 'create'} />
+  {o && <input type="hidden" name="id" value={o.id} />}
+
+  <div class="row three">
+    <div class="field">
+      <label for="of-slug">Slug (URL)</label>
+      {o
+        ? <input id="of-slug" type="text" value={o.slug} disabled />
+        : <input id="of-slug" name="slug" type="text" required pattern="[a-z0-9-]+" placeholder="turquie-janvier" />}
+      <small>minuscules, chiffres, tirets — définitif après création</small>
+    </div>
+    <div class="field">
+      <label for="of-country">Pays (texte libre)</label>
+      <input id="of-country" name="country_label" type="text" value={o?.country_label ?? ''} placeholder="Turquie" />
+    </div>
+    <div class="field">
+      <label for="of-flag">Drapeau (emoji)</label>
+      <input id="of-flag" name="flag" type="text" value={o?.flag ?? ''} placeholder="🇹🇷" />
+    </div>
+  </div>
+
+  <div class="row three">
+    <div class="field">
+      <label for="of-dest">Destination liée (facultatif)</label>
+      <select id="of-dest" name="destination_id">
+        <option value="">—</option>
+        {destinations.map((d: any) => <option value={d.id} selected={o?.destination_id === d.id}>{d.flag} {d.title_fr}</option>)}
+      </select>
+    </div>
+    <div class="field--check" style="align-self:end">
+      <input id="of-active" name="active" type="checkbox" checked={o ? o.active : true} />
+      <label for="of-active">Active</label>
+    </div>
+    <div class="field--check" style="align-self:end">
+      <input id="of-featured" name="featured" type="checkbox" checked={o?.featured} />
+      <label for="of-featured">Bannière page d’accueil</label>
+    </div>
+  </div>
+
+  <fieldset>
+    <legend>Durée & places</legend>
+    <div class="row two">
+      <div class="field">
+        <label for="of-starts">Début (vide = déjà commencée)</label>
+        <input id="of-starts" name="starts_at" type="datetime-local" value={dtLocal(o?.starts_at ?? null)} />
+      </div>
+      <div class="field">
+        <label for="of-ends">Fin (vide = sans expiration)</label>
+        <input id="of-ends" name="ends_at" type="datetime-local" value={dtLocal(o?.ends_at ?? null)} />
+      </div>
+    </div>
+    <div class="row two">
+      <div class="field">
+        <label for="of-total">Places totales (vide = illimité)</label>
+        <input id="of-total" name="slots_total" type="number" min="1" value={o?.slots_total ?? ''} />
+      </div>
+      <div class="field">
+        <label for="of-taken">Places prises</label>
+        <input id="of-taken" name="slots_taken" type="number" min="0" value={o?.slots_taken ?? 0} />
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Contenu</legend>
+    <div class="row two">
+      <div class="field"><label for="of-tfr">Titre (FR)</label><input id="of-tfr" name="title_fr" type="text" required value={o?.title_fr ?? ''} /></div>
+      <div class="field"><label for="of-tar">Titre (arabe — facultatif)</label><input id="of-tar" name="title_ar" type="text" dir="rtl" value={o?.title_ar ?? ''} /></div>
+    </div>
+    <div class="row two">
+      <div class="field"><label for="of-sfr">Résumé (FR)</label><textarea id="of-sfr" name="summary_fr" required rows="2">{o?.summary_fr ?? ''}</textarea></div>
+      <div class="field"><label for="of-sar">Résumé (arabe — facultatif)</label><textarea id="of-sar" name="summary_ar" dir="rtl" rows="2">{o?.summary_ar ?? ''}</textarea></div>
+    </div>
+    <div class="row two">
+      <div class="field"><label for="of-bfr">Description longue (FR — facultatif)</label><textarea id="of-bfr" name="body_fr" rows="5">{o?.body_fr ?? ''}</textarea></div>
+      <div class="field"><label for="of-bar">Description longue (arabe — facultatif)</label><textarea id="of-bar" name="body_ar" dir="rtl" rows="5">{o?.body_ar ?? ''}</textarea></div>
+    </div>
+    <UploadField name="image" label="Image (photo large)" value={o?.image} hint="webp/jpg/png, max 4 Mo" />
+  </fieldset>
+
+  <fieldset>
+    <legend>WhatsApp</legend>
+    <div class="row two">
+      <div class="field"><label for="of-wfr">Message prérempli (FR)</label><textarea id="of-wfr" name="whatsapp_fr" rows="2">{o?.whatsapp_fr ?? ''}</textarea></div>
+      <div class="field"><label for="of-war">Message prérempli (arabe — facultatif)</label><textarea id="of-war" name="whatsapp_ar" dir="rtl" rows="2">{o?.whatsapp_ar ?? ''}</textarea></div>
+    </div>
+  </fieldset>
+
+  <div class="admin-actions">
+    <button class="btn btn--sun" type="submit">{o ? 'Enregistrer' : 'Créer l’offre'}</button>
+    <a class="btn btn--ghost" href="/admin/offers">Annuler</a>
+  </div>
+</form>

@@ -1,0 +1,25 @@
+---
+import '../../styles/global.css';
+export const prerender = false;
+const err = Astro.url.searchParams.get('err');
+---
+<!doctype html>
+<html lang="fr" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Connexion · Admin</title>
+  </head>
+  <body class="admin">
+    <form class="login-card" method="post" action="/api/admin/login">
+      <h1 style="font-size:1.3rem">Deve Travel · <span style="color:var(--sun)">Admin</span></h1>
+      {err && <p class="form__msg err" style="display:block">{err}</p>}
+      <div class="field">
+        <label for="pw">Mot de passe</label>
+        <input id="pw" name="password" type="password" required autocomplete="current-password" autofocus />
+      </div>
+      <button class="btn btn--sun btn--block" type="submit">Se connecter</button>
+    </form>
+  </body>
+</html>

@@ -93,6 +93,7 @@ const path = Astro.url.pathname;
               kind: kind,
               service: el && el.getAttribute('data-service') || null,
               destination: el && el.getAttribute('data-destination') || null,
+              offer_slug: el && el.getAttribute('data-offer') || null,
               locale: document.documentElement.lang,
               page_path: location.pathname,
               source: document.referrer || null,

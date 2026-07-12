@@ -1,0 +1,11 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import OfferForm from '../../../components/admin/OfferForm.astro';
+import { listDestinationsRaw } from '../../../lib/admin';
+export const prerender = false;
+const destinations = await listDestinationsRaw();
+---
+<Admin title="Nouvelle offre" active="offers">
+  <h1>Nouvelle offre</h1>
+  <OfferForm destinations={destinations} />
+</Admin>

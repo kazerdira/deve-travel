@@ -1,0 +1,48 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import { listServicesRaw } from '../../../lib/admin';
+export const prerender = false;
+const services = await listServicesRaw();
+---
+<Admin title="Services" active="services">
+  <div class="admin-head">
+    <h1>Services</h1>
+    <a class="btn btn--sun btn--sm" href="/admin/services/new">+ Nouveau service</a>
+  </div>
+  <div class="tbl-scroll">
+    <table class="tbl">
+      <thead><tr><th>Service</th><th>Ordre</th><th>État</th><th>Global</th><th style="width:280px">Actions</th></tr></thead>
+      <tbody>
+        {services.length === 0 && <tr><td colspan="5" class="muted">Aucun service.</td></tr>}
+        {services.map((s: any) => (
+          <tr>
+            <td><b>{s.title_fr}</b><div class="muted">{s.id}</div></td>
+            <td>{s.sort_order}</td>
+            <td>{s.available ? <span class="badge badge--on">visible</span> : <span class="badge badge--off">masqué</span>}</td>
+            <td>{s.is_global ? '🌍' : '—'}</td>
+            <td>
+              <div class="admin-actions">
+                <a class="btn btn--ghost btn--sm" href={`/admin/services/${s.id}`}>Modifier</a>
+                <form method="post" action="/api/admin/services">
+                  <input type="hidden" name="_action" value="toggle-available" />
+                  <input type="hidden" name="id" value={s.id} />
+                  <button class="btn btn--ghost btn--sm" type="submit">{s.available ? 'Masquer' : 'Afficher'}</button>
+                </form>
+                <form method="post" action="/api/admin/services">
+                  <input type="hidden" name="_action" value="toggle-global" />
+                  <input type="hidden" name="id" value={s.id} />
+                  <button class="btn btn--ghost btn--sm" type="submit">{s.is_global ? 'Retirer global' : 'Global'}</button>
+                </form>
+                <form method="post" action="/api/admin/services" onsubmit="return confirm('Supprimer ce service ?')">
+                  <input type="hidden" name="_action" value="delete" />
+                  <input type="hidden" name="id" value={s.id} />
+                  <button class="btn btn--danger btn--sm" type="submit">Supprimer</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</Admin>

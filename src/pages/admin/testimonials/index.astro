@@ -1,0 +1,42 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import { listTestimonialsRaw } from '../../../lib/admin';
+export const prerender = false;
+const items = await listTestimonialsRaw();
+---
+<Admin title="Témoignages" active="testimonials">
+  <div class="admin-head">
+    <h1>Témoignages</h1>
+    <a class="btn btn--sun btn--sm" href="/admin/testimonials/new">+ Nouveau témoignage</a>
+  </div>
+  <div class="tbl-scroll">
+    <table class="tbl">
+      <thead><tr><th>Témoignage</th><th>Destination</th><th>État</th><th style="width:240px">Actions</th></tr></thead>
+      <tbody>
+        {items.length === 0 && <tr><td colspan="4" class="muted">Aucun témoignage.</td></tr>}
+        {items.map((tm: any) => (
+          <tr>
+            <td><b>{tm.name}</b> · {tm.city}<div class="muted" style="max-width:44ch">{tm.quote_fr}</div></td>
+            <td>{tm.destination_id ?? '—'}</td>
+            <td>{tm.published ? <span class="badge badge--on">publié</span> : <span class="badge badge--off">masqué</span>}</td>
+            <td>
+              <div class="admin-actions">
+                <a class="btn btn--ghost btn--sm" href={`/admin/testimonials/${tm.id}`}>Modifier</a>
+                <form method="post" action="/api/admin/testimonials">
+                  <input type="hidden" name="_action" value="toggle-published" />
+                  <input type="hidden" name="id" value={tm.id} />
+                  <button class="btn btn--ghost btn--sm" type="submit">{tm.published ? 'Masquer' : 'Publier'}</button>
+                </form>
+                <form method="post" action="/api/admin/testimonials" onsubmit="return confirm('Supprimer ce témoignage ?')">
+                  <input type="hidden" name="_action" value="delete" />
+                  <input type="hidden" name="id" value={tm.id} />
+                  <button class="btn btn--danger btn--sm" type="submit">Supprimer</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</Admin>

@@ -1,0 +1,11 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import DestinationForm from '../../../components/admin/DestinationForm.astro';
+import { listServicesRaw } from '../../../lib/admin';
+export const prerender = false;
+const allServices = await listServicesRaw();
+---
+<Admin title="Nouvelle destination" active="destinations">
+  <h1>Nouvelle destination</h1>
+  <DestinationForm allServices={allServices} />
+</Admin>

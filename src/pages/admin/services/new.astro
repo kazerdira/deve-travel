@@ -1,0 +1,9 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import ServiceForm from '../../../components/admin/ServiceForm.astro';
+export const prerender = false;
+---
+<Admin title="Nouveau service" active="services">
+  <h1>Nouveau service</h1>
+  <ServiceForm />
+</Admin>

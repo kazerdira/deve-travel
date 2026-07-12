@@ -356,3 +356,56 @@ body{padding-block-end:78px}
 .ocard__body p{margin:0}
 .ocard__urgency{font-family:var(--font-ui);font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ember)}
 [dir="rtl"] .ocard__urgency{font-family:var(--font-ar);letter-spacing:0}
+
+/* ============================================================
+   ADMIN — dense, functional tables & forms (v2). Site tokens only.
+   ============================================================ */
+.admin{background:var(--sand);padding-block-end:0}
+.admin-wrap{width:min(1200px,100% - 2.5rem);margin-inline:auto}
+.admin-top{background:var(--ink);color:#fff;padding-block:.6rem;position:sticky;top:0;z-index:50}
+.admin-top__bar{display:flex;align-items:center;gap:1.4rem;flex-wrap:wrap}
+.admin-brand{font-family:var(--font-display);font-weight:800;color:#fff}
+.admin-brand span{color:var(--amber)}
+.admin-nav{display:flex;gap:1rem;flex-wrap:wrap;margin-inline-end:auto}
+.admin-nav a{font-family:var(--font-ui);font-size:.9rem;font-weight:600;color:rgba(255,255,255,.75);padding-block:.3rem}
+.admin-nav a:hover{color:#fff}
+.admin-nav a[aria-current="page"]{color:var(--amber);border-block-end:2px solid var(--amber)}
+.admin-top .btn--ghost{color:#fff;border-color:rgba(255,255,255,.35)}
+.admin-main{padding-block:1.6rem 3rem}
+.admin-main h1{font-size:1.5rem;margin-block-end:1rem}
+.admin-main h2{font-size:1.1rem;margin-block:1.4rem .6rem}
+.admin-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-block-end:1rem}
+.admin-head h1{margin:0}
+
+.tbl{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;font-size:.9rem}
+.tbl th,.tbl td{padding:.55rem .7rem;text-align:start;border-block-end:1px solid var(--line);vertical-align:middle}
+.tbl th{font-family:var(--font-ui);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--sand-2)}
+.tbl tr:last-child td{border-block-end:none}
+.tbl-scroll{overflow-x:auto;border-radius:var(--radius-sm)}
+.tbl .muted{color:var(--muted)}
+.tbl select{font:inherit;padding:.25rem .4rem;border:1px solid var(--line-2);border-radius:8px;background:#fff}
+.tbl form{margin:0;display:inline-flex;gap:.3rem;align-items:center}
+
+.admin-form{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:1.4rem;display:grid;gap:1rem;max-width:860px}
+.admin-form .row{display:grid;gap:1rem}
+@media(min-width:760px){.admin-form .row.two{grid-template-columns:1fr 1fr}.admin-form .row.three{grid-template-columns:1fr 1fr 1fr}}
+.admin-form fieldset{border:1px dashed var(--line-2);border-radius:var(--radius-sm);padding:1rem;display:grid;gap:.9rem;margin:0}
+.admin-form legend{font-family:var(--font-ui);font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ember);padding-inline:.4rem}
+.admin-form .field small{color:var(--muted)}
+.field--check{display:flex;align-items:center;gap:.5rem}
+.field--check input{width:auto}
+.field--check label{font-family:var(--font-ui);font-weight:600;font-size:.9rem}
+.admin-actions{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center}
+.btn--sm{min-height:34px;padding:.3rem .8rem;font-size:.82rem}
+.btn--danger{background:#8A2A2A;color:#fff}
+.btn--danger:hover{background:#6d1f1f}
+.badge{display:inline-block;font-family:var(--font-ui);font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.15rem .5rem;border-radius:6px;background:var(--sand-2);color:var(--muted)}
+.badge--on{background:#E7F6ED;color:#16643A}
+.badge--off{background:#FCEBEB;color:#8A2A2A}
+.stat-cards{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-block-end:1.6rem}
+.stat-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-sm);padding:1rem}
+.stat-card b{display:block;font-family:var(--font-display);font-size:1.9rem;color:var(--sun);line-height:1.1}
+.stat-card span{font-family:var(--font-ui);font-size:.82rem;color:var(--muted)}
+.upload-row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.upload-row img{width:54px;height:54px;object-fit:contain;background:var(--sand-2);border-radius:8px;border:1px solid var(--line)}
+.login-card{max-width:380px;margin:12vh auto;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:2rem;display:grid;gap:1rem}

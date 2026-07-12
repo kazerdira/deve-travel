@@ -1,0 +1,68 @@
+---
+// Plain, dense admin shell. Reuses the site's design tokens — no design system.
+import '../styles/global.css';
+interface Props { title: string; active?: string; }
+const { title, active = '' } = Astro.props;
+const ok = Astro.url.searchParams.get('ok');
+const err = Astro.url.searchParams.get('err');
+const nav = [
+  ['/admin', 'Tableau de bord', 'dash'],
+  ['/admin/leads', 'Leads', 'leads'],
+  ['/admin/offers', 'Offres', 'offers'],
+  ['/admin/destinations', 'Destinations', 'destinations'],
+  ['/admin/services', 'Services', 'services'],
+  ['/admin/testimonials', 'Témoignages', 'testimonials'],
+];
+---
+<!doctype html>
+<html lang="fr" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>{title} · Admin</title>
+  </head>
+  <body class="admin">
+    <header class="admin-top">
+      <div class="admin-wrap admin-top__bar">
+        <a class="admin-brand" href="/admin">Deve Travel · <span>Admin</span></a>
+        <nav class="admin-nav">
+          {nav.map(([href, label, key]) => (
+            <a href={href} aria-current={active === key ? 'page' : undefined}>{label}</a>
+          ))}
+        </nav>
+        <form method="post" action="/api/admin/logout" style="margin:0">
+          <button class="btn btn--ghost" style="min-height:36px;padding-inline:.9rem;font-size:.85rem" type="submit">Déconnexion</button>
+        </form>
+      </div>
+    </header>
+    <main class="admin-wrap admin-main">
+      {ok && <p class="form__msg ok" style="display:block;margin-block-end:1rem">Enregistré ✓</p>}
+      {err && <p class="form__msg err" style="display:block;margin-block-end:1rem">Erreur : {err}</p>}
+      <slot />
+    </main>
+
+    <!-- progressive enhancement: direct image upload into the path fields -->
+    <script is:inline>
+      (function () {
+        document.querySelectorAll('input[type=file][data-upload-for]').forEach(function (inp) {
+          inp.addEventListener('change', async function () {
+            var target = document.getElementById(inp.getAttribute('data-upload-for'));
+            var f = inp.files && inp.files[0];
+            if (!target || !f) return;
+            var fd = new FormData();
+            fd.append('file', f);
+            inp.disabled = true;
+            try {
+              var r = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+              var j = await r.json();
+              if (j.ok) target.value = j.path;
+              else alert(j.error || 'Upload échoué');
+            } catch (e) { alert('Upload échoué'); }
+            inp.disabled = false;
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>

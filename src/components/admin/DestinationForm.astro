@@ -1,0 +1,129 @@
+---
+import UploadField from './UploadField.astro';
+interface Props { destination?: any; allServices: any[]; }
+const { destination: d = null, allServices } = Astro.props;
+const tracks: any[] = d?.tracks ?? [];
+const serviceIds: string[] = d?.serviceIds ?? [];
+const trackOf = (key: string) => tracks.find((t) => t.key === key);
+const TRACKS = [
+  { key: 'student', label: 'Étudiants' },
+  { key: 'worker', label: 'Travailleurs' },
+  { key: 'pr', label: 'Résidence / Installation' },
+];
+---
+<form class="admin-form" method="post" action="/api/admin/destinations">
+  <input type="hidden" name="_action" value={d ? 'update' : 'create'} />
+  {d && <input type="hidden" name="id" value={d.id} />}
+
+  <div class="row three">
+    <div class="field">
+      <label for="d-slug">Slug (URL)</label>
+      {d
+        ? <input id="d-slug" type="text" value={d.id} disabled />
+        : <input id="d-slug" name="slug" type="text" required pattern="[a-z0-9-]+" placeholder="turquie" />}
+      <small>minuscules, chiffres, tirets — définitif après création</small>
+    </div>
+    <div class="field">
+      <label for="d-flag">Drapeau (emoji)</label>
+      <input id="d-flag" name="flag" type="text" value={d?.flag ?? ''} placeholder="🇹🇷" />
+    </div>
+    <div class="field">
+      <label for="d-order">Ordre d’affichage</label>
+      <input id="d-order" name="sort_order" type="number" value={d?.sort_order ?? 100} />
+    </div>
+  </div>
+
+  <div class="field--check">
+    <input id="d-avail" name="available" type="checkbox" checked={d ? d.available : true} />
+    <label for="d-avail">Disponible (décoché = carte « Bientôt », page non indexée)</label>
+  </div>
+
+  <fieldset>
+    <legend>Contenu</legend>
+    <div class="row two">
+      <div class="field"><label for="d-tfr">Titre (FR)</label><input id="d-tfr" name="title_fr" type="text" required value={d?.title_fr ?? ''} /></div>
+      <div class="field"><label for="d-tar">Titre (arabe — facultatif)</label><input id="d-tar" name="title_ar" type="text" dir="rtl" value={d?.title_ar ?? ''} /></div>
+    </div>
+    <div class="row two">
+      <div class="field"><label for="d-ifr">Introduction (FR)</label><textarea id="d-ifr" name="intro_fr" required rows="3">{d?.intro_fr ?? ''}</textarea></div>
+      <div class="field"><label for="d-iar">Introduction (arabe — facultatif)</label><textarea id="d-iar" name="intro_ar" dir="rtl" rows="3">{d?.intro_ar ?? ''}</textarea></div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Images & couleurs</legend>
+    <UploadField name="image_3d" label="Image 3D flottante (PNG transparent)" value={d?.image_3d} hint="png, max 4 Mo" />
+    <UploadField name="image_hero" label="Photo hero (large)" value={d?.image_hero} hint="webp/jpg, max 4 Mo" />
+    <div class="row two">
+      <div class="field">
+        <label for="d-mfrom">Couleur drapeau A</label>
+        <input id="d-mfrom" name="mesh_from" type="color" value={d?.mesh_from ?? '#E45424'} style="height:44px;padding:.2rem" />
+      </div>
+      <div class="field">
+        <label for="d-mto">Couleur drapeau B</label>
+        <input id="d-mto" name="mesh_to" type="color" value={d?.mesh_to ?? '#F7B450'} style="height:44px;padding:.2rem" />
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Parcours (laisser le titre FR vide pour masquer un parcours)</legend>
+    {TRACKS.map(({ key, label }) => {
+      const tr = trackOf(key);
+      return (
+        <div style="display:grid;gap:.7rem;border-block-end:1px solid var(--line);padding-block-end:.9rem">
+          <div class="row two">
+            <div class="field">
+              <label for={`tr-${key}-tfr`}>{label} — titre (FR)</label>
+              <input id={`tr-${key}-tfr`} name={`track_${key}_title_fr`} type="text" value={tr?.title_fr ?? ''} />
+            </div>
+            <div class="field">
+              <label for={`tr-${key}-tar`}>{label} — titre (arabe — facultatif)</label>
+              <input id={`tr-${key}-tar`} name={`track_${key}_title_ar`} type="text" dir="rtl" value={tr?.title_ar ?? ''} />
+            </div>
+          </div>
+          <div class="row two">
+            <div class="field">
+              <label for={`tr-${key}-pfr`}>Points (FR — un par ligne)</label>
+              <textarea id={`tr-${key}-pfr`} name={`track_${key}_points_fr`} rows="4">{(tr?.points_fr ?? []).join('\n')}</textarea>
+            </div>
+            <div class="field">
+              <label for={`tr-${key}-par`}>Points (arabe — facultatif, un par ligne)</label>
+              <textarea id={`tr-${key}-par`} name={`track_${key}_points_ar`} dir="rtl" rows="4">{(tr?.points_ar ?? []).join('\n')}</textarea>
+            </div>
+          </div>
+        </div>
+      );
+    })}
+  </fieldset>
+
+  <fieldset>
+    <legend>Services proposés pour cette destination</legend>
+    <div class="row three">
+      {allServices.map((s: any) => (
+        <div class="field--check">
+          <input id={`svc-${s.id}`} name="services" type="checkbox" value={s.id} checked={serviceIds.includes(s.id)} />
+          <label for={`svc-${s.id}`}>{s.title_fr}{s.is_global && ' (global)'}</label>
+        </div>
+      ))}
+    </div>
+    <small class="muted">Les services « globaux » apparaissent sur toutes les destinations, cochés ou non.</small>
+  </fieldset>
+
+  <fieldset>
+    <legend>SEO (facultatif)</legend>
+    <div class="row two">
+      <div class="field"><label for="d-stfr">Titre SEO (FR)</label><input id="d-stfr" name="seo_title_fr" type="text" value={d?.seo_title_fr ?? ''} /></div>
+      <div class="field"><label for="d-star">Titre SEO (arabe)</label><input id="d-star" name="seo_title_ar" type="text" dir="rtl" value={d?.seo_title_ar ?? ''} /></div>
+    </div>
+    <div class="row two">
+      <div class="field"><label for="d-sdfr">Description SEO (FR)</label><input id="d-sdfr" name="seo_desc_fr" type="text" value={d?.seo_desc_fr ?? ''} /></div>
+      <div class="field"><label for="d-sdar">Description SEO (arabe)</label><input id="d-sdar" name="seo_desc_ar" type="text" dir="rtl" value={d?.seo_desc_ar ?? ''} /></div>
+    </div>
+  </fieldset>
+
+  <div class="admin-actions">
+    <button class="btn btn--sun" type="submit">{d ? 'Enregistrer' : 'Créer la destination'}</button>
+    <a class="btn btn--ghost" href="/admin/destinations">Annuler</a>
+  </div>
+</form>

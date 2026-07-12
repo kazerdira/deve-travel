@@ -9,4 +9,9 @@ export default defineConfig({
   adapter: node({ mode: 'standalone' }),
   site: process.env.PUBLIC_SITE_URL || 'http://localhost:4321',
   server: { port: 4321, host: true },
+  // The built-in origin check only trusts the Host header when allowedDomains
+  // is configured, so behind Railway's proxy it rejects every legitimate form
+  // POST (it compares against "http://localhost"). CSRF protection for /admin
+  // comes from the sameSite=lax session cookie instead.
+  security: { checkOrigin: false },
 });

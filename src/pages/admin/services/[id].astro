@@ -1,0 +1,13 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import ServiceForm from '../../../components/admin/ServiceForm.astro';
+import { serviceById } from '../../../lib/admin';
+export const prerender = false;
+const service = await serviceById(Astro.params.id!);
+if (!service) return Astro.redirect('/admin/services', 302);
+---
+<Admin title={`Service · ${service.title_fr}`} active="services">
+  <h1>Modifier : {service.title_fr}</h1>
+  <p style="margin-block-end:1rem"><a href={`/services/${service.id}`} target="_blank">Voir la page publique ↗</a></p>
+  <ServiceForm service={service} />
+</Admin>

@@ -1,0 +1,71 @@
+---
+import Admin from '../../layouts/Admin.astro';
+import { dashboardStats } from '../../lib/admin';
+export const prerender = false;
+const stats = await dashboardStats();
+const fmtDate = (d: Date | null) => (d ? new Date(d).toLocaleDateString('fr-FR') : '—');
+---
+<Admin title="Tableau de bord" active="dash">
+  <h1>Tableau de bord</h1>
+  {!stats ? (
+    <p class="form__msg err" style="display:block">DATABASE_URL non configuré — aucune donnée.</p>
+  ) : (
+    <>
+      <div class="stat-cards">
+        <div class="stat-card"><b>{stats.leadsWeek}</b><span>leads cette semaine</span></div>
+        <div class="stat-card"><b>{stats.clicksWeek}</b><span>clics WhatsApp cette semaine</span></div>
+        <div class="stat-card"><b>{stats.liveOffers.length}</b><span>offres en cours</span></div>
+        <div class="stat-card"><b>{stats.topOffers[0]?.offer_slug ?? '—'}</b><span>offre la plus performante (30 j)</span></div>
+      </div>
+
+      <div class="row two" style="display:grid;gap:1.4rem">
+        <section>
+          <h2>Clics WhatsApp par service (7 j)</h2>
+          <div class="tbl-scroll"><table class="tbl">
+            <thead><tr><th>Service</th><th>Clics</th></tr></thead>
+            <tbody>
+              {stats.clicksByService.length === 0 && <tr><td colspan="2" class="muted">Aucun clic cette semaine.</td></tr>}
+              {stats.clicksByService.map((r: any) => <tr><td>{r.service}</td><td>{r.n}</td></tr>)}
+            </tbody>
+          </table></div>
+
+          <h2>Clics WhatsApp par destination (7 j)</h2>
+          <div class="tbl-scroll"><table class="tbl">
+            <thead><tr><th>Destination</th><th>Clics</th></tr></thead>
+            <tbody>
+              {stats.clicksByDest.length === 0 && <tr><td colspan="2" class="muted">Aucun clic cette semaine.</td></tr>}
+              {stats.clicksByDest.map((r: any) => <tr><td>{r.destination}</td><td>{r.n}</td></tr>)}
+            </tbody>
+          </table></div>
+        </section>
+
+        <section>
+          <h2>Offres en cours</h2>
+          <div class="tbl-scroll"><table class="tbl">
+            <thead><tr><th>Offre</th><th>Fin</th><th>Places</th><th></th></tr></thead>
+            <tbody>
+              {stats.liveOffers.length === 0 && <tr><td colspan="4" class="muted">Aucune offre en cours.</td></tr>}
+              {stats.liveOffers.map((o: any) => (
+                <tr>
+                  <td>{o.title_fr} {o.featured && <span class="badge badge--on">bannière</span>}</td>
+                  <td>{fmtDate(o.ends_at)}</td>
+                  <td>{o.slots_total != null ? `${o.slots_taken}/${o.slots_total}` : '—'}</td>
+                  <td><a href={`/offres/${o.slug}`} target="_blank">voir ↗</a></td>
+                </tr>
+              ))}
+            </tbody>
+          </table></div>
+
+          <h2>Leads par offre (30 j)</h2>
+          <div class="tbl-scroll"><table class="tbl">
+            <thead><tr><th>Offre</th><th>Leads</th></tr></thead>
+            <tbody>
+              {stats.topOffers.length === 0 && <tr><td colspan="2" class="muted">Aucun lead attribué à une offre.</td></tr>}
+              {stats.topOffers.map((r: any) => <tr><td>{r.offer_slug}</td><td>{r.n}</td></tr>)}
+            </tbody>
+          </table></div>
+        </section>
+      </div>
+    </>
+  )}
+</Admin>

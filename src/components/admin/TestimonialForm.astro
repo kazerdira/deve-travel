@@ -1,0 +1,38 @@
+---
+interface Props { testimonial?: any; destinations: any[]; }
+const { testimonial: tm = null, destinations } = Astro.props;
+---
+<form class="admin-form" method="post" action="/api/admin/testimonials">
+  <input type="hidden" name="_action" value={tm ? 'update' : 'create'} />
+  {tm && <input type="hidden" name="id" value={tm.id} />}
+
+  <div class="row three">
+    <div class="field"><label for="tm-name">Nom</label><input id="tm-name" name="name" type="text" required value={tm?.name ?? ''} placeholder="Yacine B." /></div>
+    <div class="field"><label for="tm-city">Ville</label><input id="tm-city" name="city" type="text" value={tm?.city ?? ''} placeholder="Alger" /></div>
+    <div class="field">
+      <label for="tm-dest">Destination liée (facultatif)</label>
+      <select id="tm-dest" name="destination_id">
+        <option value="">—</option>
+        {destinations.map((d: any) => <option value={d.id} selected={tm?.destination_id === d.id}>{d.flag} {d.title_fr}</option>)}
+      </select>
+    </div>
+  </div>
+
+  <div class="row two">
+    <div class="field"><label for="tm-qfr">Citation (FR)</label><textarea id="tm-qfr" name="quote_fr" required rows="3">{tm?.quote_fr ?? ''}</textarea></div>
+    <div class="field"><label for="tm-qar">Citation (arabe — facultatif)</label><textarea id="tm-qar" name="quote_ar" dir="rtl" rows="3">{tm?.quote_ar ?? ''}</textarea></div>
+  </div>
+
+  <div class="row two">
+    <div class="field"><label for="tm-order">Ordre d’affichage</label><input id="tm-order" name="sort_order" type="number" value={tm?.sort_order ?? 100} /></div>
+    <div class="field--check" style="align-self:end">
+      <input id="tm-pub" name="published" type="checkbox" checked={tm ? tm.published : true} />
+      <label for="tm-pub">Publié</label>
+    </div>
+  </div>
+
+  <div class="admin-actions">
+    <button class="btn btn--sun" type="submit">{tm ? 'Enregistrer' : 'Créer le témoignage'}</button>
+    <a class="btn btn--ghost" href="/admin/testimonials">Annuler</a>
+  </div>
+</form>

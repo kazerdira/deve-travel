@@ -1,0 +1,11 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import TestimonialForm from '../../../components/admin/TestimonialForm.astro';
+import { listDestinationsRaw } from '../../../lib/admin';
+export const prerender = false;
+const destinations = await listDestinationsRaw();
+---
+<Admin title="Nouveau témoignage" active="testimonials">
+  <h1>Nouveau témoignage</h1>
+  <TestimonialForm destinations={destinations} />
+</Admin>

@@ -17,6 +17,7 @@ export const POST: APIRoute = async ({ request }) => {
     kind,
     destination: s(data.destination),
     service: s(data.service),
+    offer_slug: s(data.offer_slug),
     locale: s(data.locale, 4),
     page_path: s(data.page_path, 300),
     source: s(data.source, 300),
@@ -24,8 +25,8 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     if (sql) {
       await sql`
-        INSERT INTO events (kind, destination, service, locale, page_path, source)
-        VALUES (${row.kind}, ${row.destination}, ${row.service}, ${row.locale}, ${row.page_path}, ${row.source})`;
+        INSERT INTO events (kind, destination, service, offer_slug, locale, page_path, source)
+        VALUES (${row.kind}, ${row.destination}, ${row.service}, ${row.offer_slug}, ${row.locale}, ${row.page_path}, ${row.source})`;
     } else {
       console.log('[event:dev]', JSON.stringify(row));
     }

@@ -1,14 +1,13 @@
-// Optional Telegram admin notification. Silently no-ops if env is unset.
+// Telegram admin notification for new leads. Silently no-ops if env is unset.
+import { send, leadKeyboard } from './telegram';
+
 type Lead = {
   name: string; phone: string; email?: string;
   destination?: string; service?: string; audience?: string;
-  message?: string; locale: string; page_path?: string;
+  message?: string; locale: string; page_path?: string; offer_slug?: string;
 };
 
-export async function notifyLead(lead: Lead, agencyName: string): Promise<void> {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chat = process.env.TELEGRAM_ADMIN_CHAT_ID;
-  if (!token || !chat) return;
+export async function notifyLead(lead: Lead, agencyName: string, leadId?: number): Promise<void> {
   const digits = lead.phone.replace(/[^\d]/g, '');
   const text = [
     `🆕 *Nouveau lead* — ${agencyName}`,
@@ -17,15 +16,11 @@ export async function notifyLead(lead: Lead, agencyName: string): Promise<void> 
     lead.email ? `✉️ ${lead.email}` : '',
     `🌍 ${lead.destination ?? '—'} · ${lead.audience ?? '—'}`,
     `🧩 ${lead.service ?? '—'}`,
+    lead.offer_slug ? `🏷 Offre : ${lead.offer_slug}` : '',
     lead.message ? `💬 ${lead.message}` : '',
     `🕒 ${new Date().toLocaleString('fr-FR')} · ${lead.locale} · ${lead.page_path ?? ''}`,
     digits ? `➡️ https://wa.me/${digits}` : '',
   ].filter(Boolean).join('\n');
-  try {
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chat, text, parse_mode: 'Markdown', disable_web_page_preview: true }),
-    });
-  } catch { /* never let notification failure break the request */ }
+  // inline status buttons only when the lead has a DB row to update
+  await send(text, leadId ? { reply_markup: leadKeyboard(leadId) } : {});
 }

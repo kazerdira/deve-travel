@@ -1,0 +1,59 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import { listOffers } from '../../../lib/admin';
+export const prerender = false;
+const offers = await listOffers();
+const fmt = (d: Date | null) => (d ? new Date(d).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : '—');
+---
+<Admin title="Offres" active="offers">
+  <div class="admin-head">
+    <h1>Offres</h1>
+    <a class="btn btn--sun btn--sm" href="/admin/offers/new">+ Nouvelle offre</a>
+  </div>
+  <div class="tbl-scroll">
+    <table class="tbl">
+      <thead>
+        <tr><th>Offre</th><th>État</th><th>Fin</th><th>Places</th><th>Bannière</th><th style="width:270px">Actions</th></tr>
+      </thead>
+      <tbody>
+        {offers.length === 0 && <tr><td colspan="6" class="muted">Aucune offre. Créez la première !</td></tr>}
+        {offers.map((o: any) => (
+          <tr>
+            <td>
+              <b>{o.flag} {o.title_fr}</b>
+              <div class="muted">{o.slug}{o.country_label ? ` · ${o.country_label}` : ''}</div>
+            </td>
+            <td>
+              {o.is_live
+                ? <span class="badge badge--on">en ligne</span>
+                : <span class="badge badge--off">{o.active ? 'expirée / à venir' : 'désactivée'}</span>}
+            </td>
+            <td>{fmt(o.ends_at)}</td>
+            <td>{o.slots_total != null ? `${o.slots_taken}/${o.slots_total}` : '—'}</td>
+            <td>{o.featured ? '⭐' : '—'}</td>
+            <td>
+              <div class="admin-actions">
+                <a class="btn btn--ghost btn--sm" href={`/admin/offers/${o.id}`}>Modifier</a>
+                <form method="post" action="/api/admin/offers">
+                  <input type="hidden" name="_action" value="toggle-active" />
+                  <input type="hidden" name="id" value={o.id} />
+                  <button class="btn btn--ghost btn--sm" type="submit">{o.active ? 'Désactiver' : 'Activer'}</button>
+                </form>
+                <form method="post" action="/api/admin/offers">
+                  <input type="hidden" name="_action" value="toggle-featured" />
+                  <input type="hidden" name="id" value={o.id} />
+                  <button class="btn btn--ghost btn--sm" type="submit">{o.featured ? 'Retirer bannière' : 'Bannière'}</button>
+                </form>
+                <form method="post" action="/api/admin/offers" onsubmit="return confirm('Supprimer cette offre ?')">
+                  <input type="hidden" name="_action" value="delete" />
+                  <input type="hidden" name="id" value={o.id} />
+                  <button class="btn btn--danger btn--sm" type="submit">Supprimer</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</Admin>

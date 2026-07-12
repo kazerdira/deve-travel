@@ -1,0 +1,16 @@
+---
+// Image path field with an optional direct-upload enhancement. Without JS the
+// text input still accepts a pasted /uploads/... path.
+interface Props { name: string; label: string; value?: string | null; hint?: string; }
+const { name, label, value = '', hint } = Astro.props;
+const id = `uf-${name}`;
+---
+<div class="field">
+  <label for={id}>{label}</label>
+  <div class="upload-row">
+    {value && <img src={value} alt="" loading="lazy" />}
+    <input id={id} name={name} type="text" value={value ?? ''} placeholder="/uploads/…" style="max-width:280px" />
+    <input type="file" accept="image/png,image/jpeg,image/webp" data-upload-for={id} style="max-width:230px" />
+  </div>
+  {hint && <small class="muted">{hint}</small>}
+</div>

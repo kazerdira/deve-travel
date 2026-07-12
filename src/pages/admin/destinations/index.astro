@@ -1,0 +1,42 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import { listDestinationsRaw } from '../../../lib/admin';
+export const prerender = false;
+const dests = await listDestinationsRaw();
+---
+<Admin title="Destinations" active="destinations">
+  <div class="admin-head">
+    <h1>Destinations</h1>
+    <a class="btn btn--sun btn--sm" href="/admin/destinations/new">+ Nouvelle destination</a>
+  </div>
+  <div class="tbl-scroll">
+    <table class="tbl">
+      <thead><tr><th>Destination</th><th>Ordre</th><th>État</th><th style="width:240px">Actions</th></tr></thead>
+      <tbody>
+        {dests.length === 0 && <tr><td colspan="4" class="muted">Aucune destination.</td></tr>}
+        {dests.map((d: any) => (
+          <tr>
+            <td><b>{d.flag} {d.title_fr}</b><div class="muted">{d.id}</div></td>
+            <td>{d.sort_order}</td>
+            <td>{d.available ? <span class="badge badge--on">disponible</span> : <span class="badge badge--off">bientôt</span>}</td>
+            <td>
+              <div class="admin-actions">
+                <a class="btn btn--ghost btn--sm" href={`/admin/destinations/${d.id}`}>Modifier</a>
+                <form method="post" action="/api/admin/destinations">
+                  <input type="hidden" name="_action" value="toggle-available" />
+                  <input type="hidden" name="id" value={d.id} />
+                  <button class="btn btn--ghost btn--sm" type="submit">{d.available ? 'Passer en « Bientôt »' : 'Activer'}</button>
+                </form>
+                <form method="post" action="/api/admin/destinations" onsubmit="return confirm('Supprimer cette destination (et ses parcours) ?')">
+                  <input type="hidden" name="_action" value="delete" />
+                  <input type="hidden" name="id" value={d.id} />
+                  <button class="btn btn--danger btn--sm" type="submit">Supprimer</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</Admin>
