@@ -1,6 +1,18 @@
 // Small helpers shared by the /api/admin/* form endpoints.
 export const SLUG_RE = /^[a-z0-9-]{1,60}$/;
 
+/** Normalize whatever the admin typed into a valid slug: lowercase, strip
+ *  accents, spaces/underscores → hyphens ("Tunisie " → "tunisie"). */
+export const slugify = (raw: string): string =>
+  raw
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+
 export const str = (form: FormData, key: string): string => String(form.get(key) ?? '').trim();
 /** Optional text field: '' becomes null. */
 export const opt = (form: FormData, key: string): string | null => str(form, key) || null;

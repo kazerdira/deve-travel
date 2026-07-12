@@ -19,8 +19,8 @@ const dtLocal = (d: Date | null) => {
       <label for="of-slug">Slug (URL)</label>
       {o
         ? <input id="of-slug" type="text" value={o.slug} disabled />
-        : <input id="of-slug" name="slug" type="text" required pattern="[a-z0-9-]+" placeholder="turquie-janvier" />}
-      <small>minuscules, chiffres, tirets — définitif après création</small>
+        : <input id="of-slug" name="slug" type="text" required placeholder="turquie-janvier" autocapitalize="off" autocomplete="off" spellcheck="false" />}
+      <small>en minuscules (ex : turquie-janvier) — corrigé automatiquement, définitif après création</small>
     </div>
     <div class="field">
       <label for="of-country">Pays (texte libre)</label>

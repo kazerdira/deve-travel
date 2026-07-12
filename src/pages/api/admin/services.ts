@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { getSql } from '../../../lib/db';
-import { SLUG_RE, str, opt, bool, int, lines, backOk, backErr } from '../../../lib/admin-forms';
+import { SLUG_RE, slugify, str, opt, bool, int, lines, backOk, backErr } from '../../../lib/admin-forms';
 
 export const prerender = false;
 const LIST = '/admin/services';
@@ -70,7 +70,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
     const d = parsed.data;
 
     if (action === 'create') {
-      const id = str(form, 'slug');
+      const id = slugify(str(form, 'slug'));
       if (!SLUG_RE.test(id)) return backErr(redirect, LIST, 'slug invalide (a-z, 0-9 et tirets uniquement)');
       await sql`
         INSERT INTO services (id, sort_order, available, is_global, icon, icon_image,

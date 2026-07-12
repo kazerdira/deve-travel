@@ -21,8 +21,8 @@ const TRACKS = [
       <label for="d-slug">Slug (URL)</label>
       {d
         ? <input id="d-slug" type="text" value={d.id} disabled />
-        : <input id="d-slug" name="slug" type="text" required pattern="[a-z0-9-]+" placeholder="turquie" />}
-      <small>minuscules, chiffres, tirets — définitif après création</small>
+        : <input id="d-slug" name="slug" type="text" required placeholder="turquie" autocapitalize="off" autocomplete="off" spellcheck="false" />}
+      <small>en minuscules (ex : tunisie) — corrigé automatiquement, définitif après création</small>
     </div>
     <div class="field">
       <label for="d-flag">Drapeau (emoji)</label>

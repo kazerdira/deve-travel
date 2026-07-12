@@ -14,8 +14,8 @@ const iconKeys = Object.keys(icons);
       <label for="s-slug">Slug (URL)</label>
       {s
         ? <input id="s-slug" type="text" value={s.id} disabled />
-        : <input id="s-slug" name="slug" type="text" required pattern="[a-z0-9-]+" placeholder="assurance-voyage" />}
-      <small>minuscules, chiffres, tirets — définitif après création</small>
+        : <input id="s-slug" name="slug" type="text" required placeholder="assurance-voyage" autocapitalize="off" autocomplete="off" spellcheck="false" />}
+      <small>en minuscules (ex : assurance-voyage) — corrigé automatiquement, définitif après création</small>
     </div>
     <div class="field">
       <label for="s-order">Ordre d’affichage</label>
