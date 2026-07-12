@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+import { type Locale, t } from '../i18n/ui';
+import { SITE } from '../consts';
+interface Props { locale: Locale; kind: 'legal' | 'privacy'; }
+const { locale, kind } = Astro.props;
+const title = kind === 'legal' ? t(locale, 'footer.legal') : t(locale, 'footer.privacy');
+const legalFr = [
+  ['Éditeur', `Ce site est édité par ${SITE.name}, agence d’accompagnement administratif basée à ${SITE.city}, Algérie.`],
+  ['Objet', `${SITE.name} propose des prestations d’accompagnement (inscription aux tests de langue, constitution de dossiers, prise de rendez-vous, traduction, billetterie, hébergement). Nous ne délivrons pas de visas et ne garantissons aucune décision des autorités consulaires.`],
+  ['Contact', `Pour toute question : WhatsApp ${SITE.phoneDisplay}.`],
+  ['Propriété', `L’ensemble des contenus de ce site est la propriété de ${SITE.name}, sauf mention contraire.`],
+];
+const legalAr = [
+  ['الناشر', `يُدار هذا الموقع من طرف ${SITE.name}، وكالة مرافقة إدارية مقرها ${SITE.city}، الجزائر.`],
+  ['الغرض', `تقدّم ${SITE.name} خدمات مرافقة (التسجيل في اختبارات اللغة، إعداد الملفات، حجز المواعيد، الترجمة، التذاكر، السكن). لا نصدر التأشيرات ولا نضمن أي قرار للسلطات القنصلية.`],
+  ['التواصل', `لأي استفسار: واتساب ${SITE.phoneDisplay}.`],
+  ['الملكية', `جميع محتويات هذا الموقع ملك لـ ${SITE.name} ما لم يُذكر خلاف ذلك.`],
+];
+const privFr = [
+  ['Données collectées', 'Lorsque vous remplissez le formulaire, nous collectons votre nom, votre téléphone, et si vous les fournissez votre e-mail, destination, service et message.'],
+  ['Finalité', 'Ces données servent uniquement à vous recontacter et à préparer votre devis. Elles ne sont ni vendues ni cédées à des tiers.'],
+  ['Conservation', 'Vos données sont conservées le temps du traitement de votre demande, puis supprimées sur demande.'],
+  ['Vos droits', `Vous pouvez demander la consultation ou la suppression de vos données à tout moment via WhatsApp ${SITE.phoneDisplay}.`],
+];
+const privAr = [
+  ['البيانات المجمّعة', 'عند ملء النموذج، نجمع اسمك ورقم هاتفك، وإن قدّمتها بريدك الإلكتروني والوجهة والخدمة والرسالة.'],
+  ['الغرض', 'تُستعمل هذه البيانات فقط للتواصل معك وتحضير عرض السعر. لا تُباع ولا تُمنح لأطراف أخرى.'],
+  ['مدة الحفظ', 'تُحفظ بياناتك مدة معالجة طلبك، ثم تُحذف عند الطلب.'],
+  ['حقوقك', `يمكنك طلب الاطلاع على بياناتك أو حذفها في أي وقت عبر واتساب ${SITE.phoneDisplay}.`],
+];
+const sections = kind === 'legal' ? (locale === 'ar' ? legalAr : legalFr) : (locale === 'ar' ? privAr : privFr);
+---
+<Base locale={locale} title={title} description={title} noindex={true}>
+  <section class="section">
+    <div class="container" style="max-width:64ch">
+      <div class="section-head reveal">
+        <span class="kicker">{title}</span>
+        <h1 class="h-1">{title}</h1>
+      </div>
+      <div class="prose reveal">
+        {sections.map(([h, b]) => (
+          <div style="margin-block-end:1.4rem">
+            <h2 class="h-2" style="font-size:1.1rem;margin-block-end:.4rem">{h}</h2>
+            <p>{b}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>

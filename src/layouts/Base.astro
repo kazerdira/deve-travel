@@ -1,0 +1,113 @@
+---
+import '../styles/global.css';
+import Head from '../components/Head.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import StickyCta from '../components/StickyCta.astro';
+import { type Locale, dir } from '../i18n/ui';
+interface Props { locale: Locale; title: string; description: string; noindex?: boolean; }
+const { locale, title, description, noindex = false } = Astro.props;
+const path = Astro.url.pathname;
+---
+<!doctype html>
+<html lang={locale} dir={dir(locale)}>
+  <head>
+    <Head locale={locale} title={title} description={description} path={path} noindex={noindex} />
+  </head>
+  <body>
+    <Header locale={locale} path={path} />
+    <main>
+      <slot />
+    </main>
+    <Footer locale={locale} />
+    <StickyCta locale={locale} />
+
+    <!-- motion runtime: reveals, counters, header state, hero parallax -->
+    <script is:inline>
+      (function () {
+        var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // scroll reveals
+        var reveals = document.querySelectorAll('.reveal');
+        if (rm || !('IntersectionObserver' in window)) {
+          reveals.forEach(function (el) { el.classList.add('in'); });
+        } else {
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+          }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+          reveals.forEach(function (el) { io.observe(el); });
+        }
+
+        // count-up stats
+        function countUp(el) {
+          var target = parseFloat(el.getAttribute('data-count')) || 0;
+          var prefix = el.getAttribute('data-prefix') || '';
+          var suffix = el.getAttribute('data-suffix') || '';
+          if (rm) { el.textContent = prefix + target + suffix; return; }
+          var start = null, dur = 1400;
+          function step(ts) {
+            if (!start) start = ts;
+            var p = Math.min((ts - start) / dur, 1);
+            var eased = 1 - Math.pow(1 - p, 3);
+            el.textContent = prefix + Math.round(target * eased) + suffix;
+            if (p < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        }
+        var counters = document.querySelectorAll('[data-count]');
+        if ('IntersectionObserver' in window) {
+          var cio = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) { if (e.isIntersecting) { countUp(e.target); cio.unobserve(e.target); } });
+          }, { threshold: 0.6 });
+          counters.forEach(function (el) { cio.observe(el); });
+        } else {
+          counters.forEach(countUp);
+        }
+
+        // header scrolled state
+        var header = document.getElementById('siteHeader');
+        function onScroll() { if (header) header.classList.toggle('scrolled', window.scrollY > 12); }
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        // hero parallax (desktop pointer only)
+        if (!rm && window.matchMedia('(pointer:fine)').matches) {
+          var scene = document.querySelector('.hero__scene svg');
+          if (scene) {
+            window.addEventListener('mousemove', function (ev) {
+              var cx = (ev.clientX / window.innerWidth - 0.5);
+              var cy = (ev.clientY / window.innerHeight - 0.5);
+              scene.style.transform = 'translate(' + (cx * 14).toFixed(1) + 'px,' + (cy * 10).toFixed(1) + 'px)';
+            }, { passive: true });
+          }
+        }
+      })();
+    </script>
+
+    <!-- WhatsApp / call click tracking beacon -->
+    <script is:inline>
+      (function () {
+        function track(kind, el) {
+          try {
+            var body = JSON.stringify({
+              kind: kind,
+              service: el && el.getAttribute('data-service') || null,
+              destination: el && el.getAttribute('data-destination') || null,
+              locale: document.documentElement.lang,
+              page_path: location.pathname,
+              source: document.referrer || null,
+            });
+            if (navigator.sendBeacon) navigator.sendBeacon('/api/track', new Blob([body], { type: 'application/json' }));
+            else fetch('/api/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true });
+          } catch (e) {}
+        }
+        document.addEventListener('click', function (e) {
+          var wa = e.target.closest && e.target.closest('[data-wa]');
+          if (wa) track('wa_click', wa);
+          var call = e.target.closest && e.target.closest('[data-call]');
+          if (call) track('call_click', call);
+        }, true);
+      })();
+    </script>
+  </body>
+</html>

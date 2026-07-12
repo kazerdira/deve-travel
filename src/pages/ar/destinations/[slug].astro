@@ -1,0 +1,7 @@
+---
+import DestinationDetail from '../../../views/DestinationDetail.astro';
+import { getEntry } from 'astro:content';
+const { slug } = Astro.params;
+if (!(await getEntry('destinations', slug!))) return new Response(null, { status: 404 });
+---
+<DestinationDetail locale="ar" slug={slug!} />

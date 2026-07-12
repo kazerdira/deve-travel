@@ -1,0 +1,14 @@
+---
+import type { Locale } from '../i18n/ui';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const items = locale === 'ar'
+  ? ['باريس', 'مونتريال', 'ليون', 'كيبيك', 'مرسيليا', 'تورنتو', 'مدريد', 'لشبونة']
+  : ['Paris', 'Montréal', 'Lyon', 'Québec', 'Marseille', 'Toronto', 'Madrid', 'Lisbonne'];
+const loop = [...items, ...items];
+---
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    {loop.map((it) => <span class="marquee__item">{it}</span>)}
+  </div>
+</div>

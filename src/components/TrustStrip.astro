@@ -1,0 +1,16 @@
+---
+import { TRUST } from '../consts';
+import type { Locale } from '../i18n/ui';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+<div class="stats">
+  {TRUST.map((x, i) => (
+    <div class="stat reveal" data-d={String((i % 4) + 1)}>
+      <div class="stat__n" data-count={x.n} data-prefix={x.prefix} data-suffix={x.suffix}>
+        {x.prefix}{x.n}{x.suffix}
+      </div>
+      <div class="stat__l">{locale === 'ar' ? x.ar : x.fr}</div>
+    </div>
+  ))}
+</div>

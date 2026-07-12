@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro';
+import TrustStrip from '../components/TrustStrip.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { type Locale, t } from '../i18n/ui';
+import { SITE } from '../consts';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const body = locale === 'ar'
+  ? [
+      `${SITE.name} وكالة متخصصة في مرافقة المترشحين للدراسة والعمل والإقامة في الخارج، انطلاقاً من ${SITE.city}.`,
+      'نرافقك خطوة بخطوة: التسجيل في الاختبارات، إعداد الملفات، حجز المواعيد، الترجمة والتذاكر — بمرافق واحد يتابع ملفك حتى السفر.',
+      'نحن وكالة مرافقة إدارية: لا نصدر التأشيرات ولا نضمن أي قرار قنصلي، لكننا نمنح ملفك أفضل فرصة بملف نظيف ومكتمل.',
+    ]
+  : [
+      `${SITE.name} est une agence spécialisée dans l’accompagnement des candidats aux études, au travail et à l’installation à l’étranger, basée à ${SITE.city}.`,
+      'Nous vous accompagnons étape par étape : inscription aux tests, constitution des dossiers, prise de rendez-vous, traduction et billets — avec un seul interlocuteur qui suit votre dossier jusqu’au départ.',
+      'Nous sommes une agence d’accompagnement administratif : nous ne délivrons pas de visas et ne garantissons aucune décision consulaire, mais nous donnons à votre dossier toutes ses chances avec un dossier propre et complet.',
+    ];
+---
+<Base locale={locale} title={t(locale, 'about.title')} description={body[0]}>
+  <section class="section">
+    <div class="container" style="max-width:66ch">
+      <div class="section-head reveal">
+        <span class="kicker">{t(locale, 'nav.about')}</span>
+        <h1 class="h-1">{t(locale, 'about.title')}</h1>
+      </div>
+      <div class="prose reveal">{body.map((p) => <p>{p}</p>)}</div>
+      <div class="reveal" style="margin-block-start:1.6rem"><WhatsAppButton locale={locale} service="about" /></div>
+    </div>
+  </section>
+  <section class="section section--sand">
+    <div class="container"><TrustStrip locale={locale} /></div>
+  </section>
+</Base>

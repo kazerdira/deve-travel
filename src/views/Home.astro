@@ -1,0 +1,106 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Marquee from '../components/Marquee.astro';
+import TrustStrip from '../components/TrustStrip.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import DestinationCard from '../components/DestinationCard.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import Testimonials from '../components/Testimonials.astro';
+import LeadForm from '../components/LeadForm.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { type Locale, t } from '../i18n/ui';
+import { icon } from '../lib/icons';
+import { getCollection } from 'astro:content';
+import { SITE } from '../consts';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const dests = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
+---
+<Base locale={locale} title={t(locale, 'brand.tag')} description={t(locale, 'home.hero.lede')}>
+  <Hero locale={locale} />
+
+  <div class="section--sand" style="padding-block:1.4rem;border-block:1px solid var(--line)">
+    <Marquee locale={locale} />
+  </div>
+
+  <!-- TRUST -->
+  <section class="section" style="padding-block:clamp(2rem,5vw,3.25rem)">
+    <div class="container">
+      <div class="stats-panel reveal" style="margin-block-start:-3.5rem;position:relative;z-index:5">
+        <TrustStrip locale={locale} />
+      </div>
+    </div>
+  </section>
+
+  <!-- DESTINATIONS -->
+  <section class="section section--sand">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="kicker">{t(locale, 'nav.destinations')}</span>
+        <h2 class="h-1">{t(locale, 'home.dest.title')}</h2>
+        <p class="lede">{t(locale, 'home.dest.lede')}</p>
+      </div>
+      <div class="grid grid-4">
+        {dests.map((d, i) => <DestinationCard locale={locale} entry={d} delay={i} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="kicker">{t(locale, 'home.services.title')}</span>
+        <h2 class="h-1">{t(locale, 'home.services.title')}</h2>
+        <p class="lede">{t(locale, 'home.services.lede')}</p>
+      </div>
+      <div class="grid grid-4">
+        {services.map((s, i) => <ServiceCard locale={locale} entry={s} delay={i} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="section section--sand">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="kicker">{t(locale, 'nav.process')}</span>
+        <h2 class="h-1">{t(locale, 'home.process.title')}</h2>
+      </div>
+      <div class="reveal"><ProcessSteps locale={locale} /></div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="kicker">{t(locale, 'home.trust.title')}</span>
+        <h2 class="h-1">{t(locale, 'home.trust.title')}</h2>
+      </div>
+      <div class="reveal"><Testimonials locale={locale} /></div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA + FORM (dusk / golden hour) -->
+  <section class="section section--dusk" id="devis">
+    <div class="container" style="display:grid;gap:2.5rem;grid-template-columns:1fr;align-items:start">
+      <div style="max-width:52ch" class="reveal">
+        <span class="kicker">{t(locale, 'cta.quote')}</span>
+        <h2 class="h-1" style="margin-block:.7rem .6rem">{t(locale, 'form.title')}</h2>
+        <p style="opacity:.9">{t(locale, 'contact.lede')}</p>
+        <div style="margin-block-start:1.4rem;display:flex;flex-wrap:wrap;gap:.7rem">
+          <WhatsAppButton locale={locale} service="final-cta" />
+          <a class="btn btn--ghost btn--lg" href={`tel:${SITE.whatsapp}`} data-call>
+            <Fragment set:html={icon('phone')} /> {SITE.phoneDisplay}
+          </a>
+        </div>
+      </div>
+      <div class="card--form reveal" data-d="1" style="max-width:660px;width:100%">
+        <LeadForm locale={locale} />
+      </div>
+    </div>
+  </section>
+</Base>

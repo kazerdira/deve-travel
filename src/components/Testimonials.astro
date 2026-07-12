@@ -1,0 +1,18 @@
+---
+import { type Locale, pick } from '../i18n/ui';
+import { getCollection } from 'astro:content';
+interface Props { locale: Locale; destination?: string; }
+const { locale, destination } = Astro.props;
+let items = (await getCollection('testimonials')).sort((a, b) => a.data.order - b.data.order);
+if (destination) items = items.filter((t) => t.data.destination === destination);
+---
+{items.length > 0 && (
+  <div class="grid grid-3">
+    {items.map((it, i) => (
+      <figure class="quote reveal" data-d={String((i % 3) + 1)}>
+        <blockquote>{pick(it.data.quote, locale)}</blockquote>
+        <figcaption><b>{it.data.name}</b> · {it.data.city}</figcaption>
+      </figure>
+    ))}
+  </div>
+)}

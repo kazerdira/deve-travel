@@ -1,0 +1,33 @@
+---
+import { type Locale, t } from '../i18n/ui';
+import { SITE } from '../consts';
+import { icon } from '../lib/icons';
+import WhatsAppButton from './WhatsAppButton.astro';
+import DepartureBoard from './DepartureBoard.astro';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const rtl = locale === 'ar';
+const title = rtl
+  ? { a: 'سافر أبعد.', b: 'ونحن نتكفّل بالباقي.' }
+  : { a: 'Partez plus loin.', b: 'On s’occupe du reste.' };
+---
+<section class="hero">
+  <div class="hero__scene" style={rtl ? 'transform:scaleX(-1)' : ''} aria-hidden="true">
+    <img class="hero__image" src="/destinations/desert-dusk.webp" alt="" loading="eager" />
+  </div>
+  <div class="hero__grain"></div>
+
+  <div class="container hero__inner">
+    <span class="kicker reveal">{t(locale, 'brand.tag')} · {SITE.city}</span>
+    <h1 class="display reveal" data-d="1">{title.a}<br /><em>{title.b}</em></h1>
+    <p class="lede reveal" data-d="1">{t(locale, 'home.hero.lede')}</p>
+    <div class="hero__cta reveal" data-d="2">
+      <WhatsAppButton locale={locale} service="hero" />
+      <a class="btn btn--ghost btn--lg" href="#devis">
+        <Fragment set:html={icon('pen')} /> {t(locale, 'cta.quote')}
+      </a>
+    </div>
+    <p class="hero__meta reveal" data-d="2"><span class="dot"></span>{t(locale, 'label.free')}</p>
+    <DepartureBoard locale={locale} />
+  </div>
+</section>

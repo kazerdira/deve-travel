@@ -1,0 +1,95 @@
+---
+import { type Locale, t, pick } from '../i18n/ui';
+import { getCollection } from 'astro:content';
+interface Props { locale: Locale; service?: string; destination?: string; compact?: boolean; }
+const { locale, service = '', destination = '', compact = false } = Astro.props;
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const dests = (await getCollection('destinations')).filter((d) => d.data.available).sort((a, b) => a.data.order - b.data.order);
+const okMsg = t(locale, 'form.ok');
+const errMsg = t(locale, 'form.err');
+const sending = t(locale, 'form.sending');
+const submitLabel = t(locale, 'form.submit');
+---
+<form class="form" id="leadForm" novalidate>
+  <div class="form__msg" id="leadMsg" role="status" aria-live="polite"></div>
+  <div class="form__row two">
+    <div class="field">
+      <label for="lf-name">{t(locale, 'form.name')}</label>
+      <input id="lf-name" name="name" type="text" required autocomplete="name" />
+    </div>
+    <div class="field">
+      <label for="lf-phone">{t(locale, 'form.phone')}</label>
+      <input id="lf-phone" name="phone" type="tel" required autocomplete="tel" inputmode="tel" />
+    </div>
+  </div>
+  {!compact && (
+    <div class="form__row two">
+      <div class="field">
+        <label for="lf-dest">{t(locale, 'form.dest')}</label>
+        <select id="lf-dest" name="destination">
+          <option value="">{t(locale, 'form.choose')}</option>
+          {dests.map((d) => <option value={d.id} selected={d.id === destination}>{pick(d.data.title, locale)}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for="lf-service">{t(locale, 'form.service')}</label>
+        <select id="lf-service" name="service">
+          <option value="">{t(locale, 'form.choose')}</option>
+          {services.map((s) => <option value={s.id} selected={s.id === service}>{pick(s.data.title, locale)}</option>)}
+        </select>
+      </div>
+    </div>
+  )}
+  <div class="field">
+    <label for="lf-aud">{t(locale, 'form.audience')}</label>
+    <select id="lf-aud" name="audience">
+      <option value="">{t(locale, 'form.choose')}</option>
+      <option value="student">{t(locale, 'aud.student')}</option>
+      <option value="worker">{t(locale, 'aud.worker')}</option>
+      <option value="pr">{t(locale, 'aud.pr')}</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="lf-msg">{t(locale, 'form.message')}</label>
+    <textarea id="lf-msg" name="message"></textarea>
+  </div>
+  {compact && <input type="hidden" name="destination" value={destination} />}
+  {compact && <input type="hidden" name="service" value={service} />}
+  <div class="form__hp" aria-hidden="true">
+    <label>Ne pas remplir<input type="text" name="company" tabindex="-1" autocomplete="off" /></label>
+  </div>
+  <button class="btn btn--sun btn--block btn--lg" type="submit" id="leadSubmit">{submitLabel}</button>
+</form>
+
+<script is:inline define:vars={{ okMsg, errMsg, sending, submitLabel, locale }}>
+  (function () {
+    var form = document.getElementById('leadForm');
+    if (!form) return;
+    var msg = document.getElementById('leadMsg');
+    var btn = document.getElementById('leadSubmit');
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      msg.className = 'form__msg';
+      var data = Object.fromEntries(new FormData(form).entries());
+      data.locale = locale;
+      data.page_path = location.pathname;
+      data.source = document.referrer || '';
+      btn.disabled = true; btn.textContent = sending;
+      try {
+        var r = await fetch('/api/lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (!r.ok) throw new Error('bad');
+        msg.textContent = okMsg; msg.className = 'form__msg ok';
+        form.reset();
+      } catch (err) {
+        msg.textContent = errMsg; msg.className = 'form__msg err';
+      } finally {
+        btn.disabled = false; btn.textContent = submitLabel;
+        msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  })();
+</script>

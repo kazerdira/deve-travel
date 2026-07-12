@@ -1,0 +1,39 @@
+---
+import { SITE } from '../consts';
+import { type Locale, swapLocale } from '../i18n/ui';
+interface Props { locale: Locale; title: string; description: string; path: string; noindex?: boolean; }
+const { locale, title, description, path, noindex = false } = Astro.props;
+const fullTitle = `${title} · ${SITE.name}`;
+const canonical = new URL(path, SITE.url).href;
+const altFr = new URL(locale === 'ar' ? swapLocale('ar', path) : path, SITE.url).href;
+const altAr = new URL(locale === 'ar' ? path : swapLocale('fr', path), SITE.url).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: SITE.name,
+  areaServed: 'DZ',
+  address: { '@type': 'PostalAddress', addressLocality: SITE.city, addressCountry: 'DZ' },
+  url: SITE.url,
+  sameAs: [SITE.fb, SITE.ig].filter(Boolean),
+};
+---
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex,follow" />}
+<link rel="alternate" hreflang="fr" href={altFr} />
+<link rel="alternate" hreflang="ar" href={altAr} />
+<link rel="alternate" hreflang="x-default" href={altFr} />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content={locale === 'ar' ? 'ar_DZ' : 'fr_FR'} />
+<meta name="theme-color" content="#0E1E33" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

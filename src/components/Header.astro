@@ -1,0 +1,61 @@
+---
+import { SITE } from '../consts';
+import { type Locale, t, localize, swapLocale } from '../i18n/ui';
+import { waUrl } from '../lib/wa';
+import { icon } from '../lib/icons';
+interface Props { locale: Locale; path: string; }
+const { locale, path } = Astro.props;
+const nav = [
+  { href: localize(locale, '/services'), label: t(locale, 'nav.services') },
+  { href: localize(locale, '/destinations'), label: t(locale, 'nav.destinations') },
+  { href: localize(locale, '/processus'), label: t(locale, 'nav.process') },
+  { href: localize(locale, '/a-propos'), label: t(locale, 'nav.about') },
+  { href: localize(locale, '/contact'), label: t(locale, 'nav.contact') },
+];
+const isCur = (href: string) => path === href || (href !== localize(locale, '/') && path.startsWith(href));
+const frHref = locale === 'ar' ? swapLocale('ar', path) : path;
+const arHref = locale === 'ar' ? path : swapLocale('fr', path);
+---
+<header class="site-header" id="siteHeader">
+  <div class="container site-header__bar">
+    <a class="brand" href={localize(locale, '/')} aria-label={SITE.name}>
+      <img src="/logo.png" alt={SITE.name} width="120" height="42" />
+    </a>
+    <nav class="nav" aria-label="Principal">
+      {nav.map((n) => <a href={n.href} aria-current={isCur(n.href) ? 'page' : undefined}>{n.label}</a>)}
+    </nav>
+    <div class="header__actions">
+      <div class="lang-switch" role="group" aria-label="Langue">
+        <a href={frHref} aria-current={locale === 'fr' ? 'true' : undefined} hreflang="fr">FR</a>
+        <a href={arHref} aria-current={locale === 'ar' ? 'true' : undefined} hreflang="ar">ع</a>
+      </div>
+      <a class="btn btn--wa header__wa" href={waUrl(t(locale, 'cta.whatsapp'))} target="_blank" rel="noopener" data-wa data-service="header" style="min-height:44px;padding-inline:1.1rem">
+        <Fragment set:html={icon('whatsapp')} /> WhatsApp
+      </a>
+      <button class="nav-toggle" aria-label="Menu" aria-expanded="false" id="navToggle">
+        <Fragment set:html={icon('menu')} />
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="drawer" id="drawer">
+  <div class="drawer__panel">
+    <button class="drawer__close" aria-label="Fermer" id="drawerClose"><Fragment set:html={icon('close')} /></button>
+    {nav.map((n) => <a class="nav-link" href={n.href}>{n.label}</a>)}
+    <a class="btn btn--wa btn--block" style="margin-block-start:1.2rem" href={waUrl(t(locale, 'cta.whatsapp'))} target="_blank" rel="noopener" data-wa data-service="drawer">
+      <Fragment set:html={icon('whatsapp')} /> {t(locale, 'cta.whatsapp')}
+    </a>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var d = document.getElementById('drawer'), t = document.getElementById('navToggle'), c = document.getElementById('drawerClose');
+    function open(v){ d.classList.toggle('open', v); t.setAttribute('aria-expanded', String(v)); document.body.style.overflow = v ? 'hidden' : ''; }
+    if (t) t.addEventListener('click', function(){ open(true); });
+    if (c) c.addEventListener('click', function(){ open(false); });
+    if (d) d.addEventListener('click', function(e){ if (e.target === d) open(false); });
+    d && d.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ open(false); }); });
+  })();
+</script>

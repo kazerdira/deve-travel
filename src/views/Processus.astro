@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { type Locale, t } from '../i18n/ui';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+<Base locale={locale} title={t(locale, 'process.title')} description={t(locale, 'process.lede')}>
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="kicker">{t(locale, 'nav.process')}</span>
+        <h1 class="h-1">{t(locale, 'process.title')}</h1>
+        <p class="lede">{t(locale, 'process.lede')}</p>
+      </div>
+      <div class="reveal"><ProcessSteps locale={locale} /></div>
+      <div class="reveal" style="margin-block-start:2.2rem"><WhatsAppButton locale={locale} service="process" /></div>
+    </div>
+  </section>
+</Base>

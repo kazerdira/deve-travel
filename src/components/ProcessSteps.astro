@@ -1,0 +1,25 @@
+---
+import type { Locale } from '../i18n/ui';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const steps = [
+  { fr: 'Contact', ar: 'التواصل', dfr: 'Vous nous écrivez sur WhatsApp, on cerne votre projet.', dar: 'تراسلنا على واتساب، ونفهم مشروعك.' },
+  { fr: 'Évaluation', ar: 'التقييم', dfr: 'On évalue votre dossier et les options réalistes.', dar: 'نُقيّم ملفك والخيارات الواقعية.' },
+  { fr: 'Dossier', ar: 'الملف', dfr: 'On constitue et vérifie chaque pièce avec vous.', dar: 'نُعدّ ونُدقّق كل وثيقة معك.' },
+  { fr: 'Suivi', ar: 'المتابعة', dfr: 'Rendez-vous, dépôt, relances : on suit jusqu’au bout.', dar: 'المواعيد والإيداع والمتابعة حتى النهاية.' },
+  { fr: 'Départ', ar: 'السفر', dfr: 'Billet, hébergement, derniers réglages avant le départ.', dar: 'التذكرة والسكن وآخر الترتيبات قبل السفر.' },
+];
+const L = (o: any) => (locale === 'ar' ? o.ar : o.fr);
+const D = (o: any) => (locale === 'ar' ? o.dar : o.dfr);
+---
+<div class="ticket">
+  <div class="ticket__row">
+    {steps.map((s, i) => (
+      <div class="ticket__step">
+        <div class="ticket__no">{i + 1}</div>
+        <h3>{L(s)}</h3>
+        <p>{D(s)}</p>
+      </div>
+    ))}
+  </div>
+</div>

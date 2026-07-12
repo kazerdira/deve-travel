@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { type Locale, t } from '../i18n/ui';
+import { getCollection } from 'astro:content';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+---
+<Base locale={locale} title={t(locale, 'services.title')} description={t(locale, 'services.lede')}>
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="kicker">{t(locale, 'nav.services')}</span>
+        <h1 class="h-1">{t(locale, 'services.title')}</h1>
+        <p class="lede">{t(locale, 'services.lede')}</p>
+      </div>
+      <div class="grid grid-3">
+        {services.map((s, i) => <ServiceCard locale={locale} entry={s} delay={i} />)}
+      </div>
+      <div class="reveal" style="margin-block-start:2.2rem"><WhatsAppButton locale={locale} service="services-index" /></div>
+    </div>
+  </section>
+</Base>

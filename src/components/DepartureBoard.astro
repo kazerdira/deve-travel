@@ -1,0 +1,21 @@
+---
+import type { Locale } from '../i18n/ui';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const from = locale === 'ar' ? 'الجزائر' : 'ALGER';
+const rows = [
+  { to: locale === 'ar' ? 'باريس' : 'PARIS',    code: 'DZ → FR', status: locale === 'ar' ? 'مفتوح' : 'OUVERT' },
+  { to: locale === 'ar' ? 'مونتريال' : 'MONTRÉAL', code: 'DZ → CA', status: locale === 'ar' ? 'مفتوح' : 'OUVERT' },
+  { to: locale === 'ar' ? 'مدريد' : 'MADRID',   code: 'DZ → ES', status: locale === 'ar' ? 'قريباً' : 'BIENTÔT' },
+];
+---
+<div class="board reveal" data-d="2" aria-hidden="true">
+  {rows.map((r) => (
+    <div class="board__row">
+      <span class="from">{from}</span>
+      <span class="arrow">✈</span>
+      <span class="to">{r.to}</span>
+      <span class="status">{r.status}</span>
+    </div>
+  ))}
+</div>

@@ -1,0 +1,115 @@
+---
+import Base from '../layouts/Base.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import LeadForm from '../components/LeadForm.astro';
+import Testimonials from '../components/Testimonials.astro';
+import { type Locale, t, pick, localize } from '../i18n/ui';
+import { icon } from '../lib/icons';
+import { getCollection, getEntry } from 'astro:content';
+interface Props { locale: Locale; slug: string; }
+const { locale, slug } = Astro.props;
+const entry = await getEntry('destinations', slug);
+if (!entry) return Astro.redirect(localize(locale, '/destinations'), 302);
+const d = entry.data;
+const seoT = d.seo ? pick(d.seo.title, locale) : pick(d.title, locale);
+const seoD = d.seo ? pick(d.seo.description, locale) : pick(d.intro, locale);
+const svc = (await getCollection('services'))
+  .filter((s) => d.services.includes(s.id))
+  .sort((a, b) => d.services.indexOf(a.id) - d.services.indexOf(b.id));
+const heroImg = `/destinations/${entry.id}-hero.webp`;   // wide destination photo (city/landmark)
+---
+<Base locale={locale} title={seoT} description={seoD} noindex={!d.available}>
+  <section class="section" style="padding-block-start:clamp(1.5rem,4vw,2.5rem)">
+    <div class="container">
+      <div class="breadcrumb reveal">
+        <a href={localize(locale, '/destinations')}>{t(locale, 'nav.destinations')}</a> / <span>{pick(d.title, locale)}</span>
+      </div>
+      <div class="dhero reveal">
+        <div class="dhero__img" style={`background-image:url('${heroImg}')`}></div>
+        <div class="dhero__scrim"></div>
+        <div class="dhero__in">
+          <h1 class="h-1">{d.flag} {pick(d.title, locale)}</h1>
+          <p class="lede" style="margin-block-start:.6rem;color:rgba(255,255,255,.92)">{pick(d.intro, locale)}</p>
+        </div>
+      </div>
+      <div style="max-width:62ch">
+        {d.available ? (
+          <>
+            {d.tracks.length > 0 && (
+              <div class="reveal" style="margin-block-start:2rem">
+                <div class="tabs" role="tablist">
+                  {d.tracks.map((tr, i) => (
+                    <button class="tab" role="tab" data-tab={tr.key} aria-selected={i === 0 ? 'true' : 'false'}>{pick(tr.title, locale)}</button>
+                  ))}
+                </div>
+                {d.tracks.map((tr, i) => (
+                  <div class={`panel ${i === 0 ? 'active' : ''}`} data-panel={tr.key}>
+                    <div class="prose"><ul class="check">{tr.points.map((p) => <li>{pick(p, locale)}</li>)}</ul></div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div class="reveal" style="margin-block-start:2rem;display:flex;flex-wrap:wrap;gap:.7rem">
+              <WhatsAppButton locale={locale} destination={entry.id} service="dest-hero" />
+              <a class="btn btn--ghost btn--lg" href="#devis"><Fragment set:html={icon('pen')} /> {t(locale, 'cta.quote')}</a>
+            </div>
+          </>
+        ) : (
+          <div class="reveal prose" style="margin-block-start:1.4rem"><p>{t(locale, 'dest.soonbody')}</p></div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  {d.available && svc.length > 0 && (
+    <section class="section section--sand">
+      <div class="container">
+        <div class="section-head reveal"><h2 class="h-2">{t(locale, 'dest.services')}</h2></div>
+        <div class="grid grid-3">
+          {svc.map((s, i) => (
+            <a class="card card--link service-card reveal" data-d={String((i % 3) + 1)} href={localize(locale, `/services/${s.id}`)}>
+              <span class="card__ic service-card__icon">
+                <img src={`/icons/${s.id}.png`} alt="" width="44" height="44" loading="lazy"
+                     onerror="this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display='grid'" />
+                <span class="ic-svg" style="display:none"><Fragment set:html={icon(s.data.icon)} /></span>
+              </span>
+              <h3>{pick(s.data.title, locale)}</h3>
+              <p class="muted small" style="margin-block-start:.5rem">{pick(s.data.tagline, locale)}</p>
+              <span class="card__cta">{t(locale, 'cta.info')} →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {d.available && (
+    <section class="section"><div class="container"><Testimonials locale={locale} destination={entry.id} /></div></section>
+  )}
+
+  <section class="section section--dusk" id="devis">
+    <div class="container" style="display:grid;gap:2rem;max-width:700px">
+      <div class="reveal">
+        <span class="kicker">{t(locale, 'cta.quote')}</span>
+        <h2 class="h-1" style="margin-block:.7rem .5rem">{t(locale, 'form.title')}</h2>
+        <p style="opacity:.9">{t(locale, 'contact.lede')}</p>
+      </div>
+      <div class="card--form reveal" data-d="1"><LeadForm locale={locale} destination={entry.id} /></div>
+    </div>
+  </section>
+</Base>
+
+<script is:inline>
+  (function () {
+    document.querySelectorAll('.tab[data-tab]').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var key = tab.getAttribute('data-tab');
+        document.querySelectorAll('.tab[data-tab]').forEach(function (t) { t.setAttribute('aria-selected', 'false'); });
+        tab.setAttribute('aria-selected', 'true');
+        document.querySelectorAll('.panel[data-panel]').forEach(function (p) {
+          p.classList.toggle('active', p.getAttribute('data-panel') === key);
+        });
+      });
+    });
+  })();
+</script>

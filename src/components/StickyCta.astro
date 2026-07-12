@@ -1,0 +1,15 @@
+---
+import { type Locale, t, localize } from '../i18n/ui';
+import { waUrl } from '../lib/wa';
+import { icon } from '../lib/icons';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+<div class="sticky-cta">
+  <a class="btn btn--wa" href={waUrl(t(locale, 'cta.whatsapp'))} target="_blank" rel="noopener" data-wa data-service="sticky">
+    <Fragment set:html={icon('whatsapp')} /> WhatsApp
+  </a>
+  <a class="btn btn--ghost" href={localize(locale, '/contact')}>
+    <Fragment set:html={icon('pen')} /> {t(locale, 'cta.quote')}
+  </a>
+</div>

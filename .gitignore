@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+*.exe
+*.dll
+*.so
+*.dylib
+.DS_Store
+npm-debug.log*

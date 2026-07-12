@@ -1,0 +1,45 @@
+---
+import { SITE } from '../consts';
+import { type Locale, t, pick, localize } from '../i18n/ui';
+import { getCollection } from 'astro:content';
+import CamelDivider from './CamelDivider.astro';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order).slice(0, 6);
+const dests = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
+const year = new Date().getFullYear();
+const brandParts = SITE.name.split(' ');
+---
+<CamelDivider />
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand">{brandParts[0]} {brandParts.length > 1 && <span>{brandParts.slice(1).join(' ')}</span>}</div>
+        <p class="small" style="opacity:.8;margin-block:.8rem;max-width:40ch">{t(locale, 'brand.tag')} · {SITE.city}</p>
+        <p class="small" style="opacity:.6;max-width:46ch">{t(locale, 'footer.disclaimer')}</p>
+      </div>
+      <div class="footer">
+        <h4>{t(locale, 'footer.services')}</h4>
+        <ul>{services.map((s) => <li><a href={localize(locale, `/services/${s.id}`)}>{pick(s.data.title, locale)}</a></li>)}</ul>
+      </div>
+      <div class="footer">
+        <h4>{t(locale, 'footer.dest')}</h4>
+        <ul>{dests.map((d) => <li><a href={localize(locale, `/destinations/${d.id}`)}>{d.data.flag} {pick(d.data.title, locale)}</a></li>)}</ul>
+        <h4 style="margin-block-start:1.3rem">{t(locale, 'contact.follow')}</h4>
+        <ul>
+          <li><a href={SITE.fb} target="_blank" rel="noopener">Facebook</a></li>
+          <li><a href={SITE.ig} target="_blank" rel="noopener">Instagram</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© {year} {SITE.name}. {t(locale, 'footer.rights')}</span>
+      <span>
+        <a href={localize(locale, '/mentions-legales')}>{t(locale, 'footer.legal')}</a>
+        &nbsp;·&nbsp;
+        <a href={localize(locale, '/confidentialite')}>{t(locale, 'footer.privacy')}</a>
+      </span>
+    </div>
+  </div>
+</footer>
