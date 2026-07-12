@@ -38,6 +38,7 @@ const S = {
   'service.included':   { fr: 'Ce qui est inclus', ar: 'ما يشمله' },
   'service.dest':       { fr: 'Destinations concernées', ar: 'الوجهات المعنية' },
   'service.related':    { fr: 'Services liés', ar: 'خدمات ذات صلة' },
+  'offers.badge':       { fr: '🔥 Offre limitée', ar: '🔥 عرض محدود' },
   'offers.title':       { fr: 'Offres exclusives', ar: 'عروض حصرية' },
   'offers.lede':        { fr: 'Des offres limitées dans le temps, négociées pour vous. Premier arrivé, premier servi.', ar: 'عروض محدودة في الوقت، تفاوضنا عليها من أجلك. الأولوية لمن يسبق.' },
   'offers.none':        { fr: 'Aucune offre en cours pour le moment. Revenez bientôt, ou écrivez-nous sur WhatsApp.', ar: 'لا توجد عروض حالياً. عد قريباً أو راسلنا على واتساب.' },

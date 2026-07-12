@@ -13,6 +13,7 @@ const line = offer ? urgency(offer, locale) : null;
 {offer && (
   <aside class="offer-banner">
     <div class="container offer-banner__in">
+      <span class="offer-banner__badge">{t(locale, 'offers.badge')}</span>
       <a class="offer-banner__main" href={localize(locale, `/offres/${offer.slug}`)}>
         <span class="offer-banner__flag">{offer.flag}</span>
         <span class="offer-banner__title">{pick(offer.title, locale)}</span>
