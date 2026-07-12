@@ -2,10 +2,10 @@
 import Base from '../layouts/Base.astro';
 import DestinationCard from '../components/DestinationCard.astro';
 import { type Locale, t } from '../i18n/ui';
-import { getCollection } from 'astro:content';
+import { getDestinations } from '../lib/content';
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
-const dests = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
+const dests = await getDestinations();
 ---
 <Base locale={locale} title={t(locale, 'dest.title')} description={t(locale, 'dest.lede')}>
   <section class="section">
@@ -16,7 +16,7 @@ const dests = (await getCollection('destinations')).sort((a, b) => a.data.order 
         <p class="lede">{t(locale, 'dest.lede')}</p>
       </div>
       <div class="grid grid-4">
-        {dests.map((d, i) => <DestinationCard locale={locale} entry={d} delay={i} />)}
+        {dests.map((d, i) => <DestinationCard locale={locale} destination={d} delay={i} />)}
       </div>
     </div>
   </section>

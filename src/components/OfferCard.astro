@@ -1,0 +1,20 @@
+---
+import { type Locale, t, pick, localize } from '../i18n/ui';
+import { urgency, type Offer } from '../lib/offers';
+interface Props { locale: Locale; offer: Offer; delay?: number; }
+const { locale, offer: o, delay = 0 } = Astro.props;
+const href = localize(locale, `/offres/${o.slug}`);
+const line = urgency(o, locale);
+---
+<a class="card card--link ocard reveal" data-d={String((delay % 3) + 1)} href={href}>
+  <div class="ocard__img" style={o.image ? `background-image:url('${o.image}')` : undefined}>
+    {o.flag && <span class="ocard__flag">{o.flag}</span>}
+  </div>
+  <div class="ocard__body">
+    {o.countryLabel && <span class="kicker">{o.countryLabel}</span>}
+    <h3>{pick(o.title, locale)}</h3>
+    <p class="muted small">{pick(o.summary, locale)}</p>
+    {line && <span class="ocard__urgency">{line}</span>}
+    <span class="card__cta">{t(locale, 'offers.see')} →</span>
+  </div>
+</a>

@@ -4,18 +4,16 @@ import WhatsAppButton from '../components/WhatsAppButton.astro';
 import LeadForm from '../components/LeadForm.astro';
 import { type Locale, t, pick, localize } from '../i18n/ui';
 import { icon } from '../lib/icons';
-import { getCollection, getEntry } from 'astro:content';
+import { getService, getServices } from '../lib/content';
 interface Props { locale: Locale; slug: string; }
 const { locale, slug } = Astro.props;
-const entry = await getEntry('services', slug);
-if (!entry) return Astro.redirect(localize(locale, '/services'), 302);
-const d = entry.data;
-const dests = (await getCollection('destinations')).filter((x) => d.destinations.includes(x.id));
-const related = (await getCollection('services'))
-  .filter((s) => s.id !== entry.id).sort((a, b) => a.data.order - b.data.order).slice(0, 3);
-const waText = pick(d.whatsapp, locale);
-const seoT = d.seo ? pick(d.seo.title, locale) : pick(d.title, locale);
-const seoD = d.seo ? pick(d.seo.description, locale) : pick(d.summary, locale);
+const svc = await getService(slug);
+if (!svc) return Astro.redirect(localize(locale, '/services'), 302);
+const dests = svc.destinations;
+const related = (await getServices({ availableOnly: true })).filter((s) => s.id !== svc.id).slice(0, 3);
+const waText = pick(svc.whatsapp, locale);
+const seoT = svc.seo ? pick(svc.seo.title, locale) : pick(svc.title, locale);
+const seoD = svc.seo ? pick(svc.seo.description, locale) : pick(svc.summary, locale);
 const titleColors = (slug: string) => slug === 'france'
   ? ['#0055A4', '#FFFFFF', '#EF4135']
   : slug === 'canada'
@@ -30,23 +28,23 @@ const titleColors = (slug: string) => slug === 'france'
   <section class="section" style="padding-block-start:clamp(1.5rem,4vw,2.5rem)">
     <div class="container">
       <div class="breadcrumb reveal">
-        <a href={localize(locale, '/services')}>{t(locale, 'nav.services')}</a> / <span>{pick(d.title, locale)}</span>
+        <a href={localize(locale, '/services')}>{t(locale, 'nav.services')}</a> / <span>{pick(svc.title, locale)}</span>
       </div>
       <div style="max-width:64ch">
         <span class="card__ic service-card__icon reveal">
-          <img src={`/icons/${entry.id}.png`} alt="" width="44" height="44" loading="lazy"
+          <img src={svc.iconImage ?? `/icons/${svc.id}.png`} alt="" width="44" height="44" loading="lazy"
                onerror="this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display='grid'" />
-          <span class="ic-svg" style="display:none"><Fragment set:html={icon(d.icon)} /></span>
+          <span class="ic-svg" style="display:none"><Fragment set:html={icon(svc.icon)} /></span>
         </span>
-        <h1 class="h-1 reveal" style="margin-block:1rem .5rem">{pick(d.title, locale)}</h1>
-        <p class="lede reveal">{pick(d.tagline, locale)}</p>
-        <div class="prose reveal" style="margin-block-start:1.4rem"><p>{pick(d.summary, locale)}</p></div>
+        <h1 class="h-1 reveal" style="margin-block:1rem .5rem">{pick(svc.title, locale)}</h1>
+        <p class="lede reveal">{pick(svc.tagline, locale)}</p>
+        <div class="prose reveal" style="margin-block-start:1.4rem"><p>{pick(svc.summary, locale)}</p></div>
 
-        {d.includes.length > 0 && (
+        {svc.includes.length > 0 && (
           <div class="reveal" style="margin-block-start:1.8rem">
             <span class="kicker">{t(locale, 'service.included')}</span>
             <ul class="check" style="margin-block-start:1rem">
-              {d.includes.map((i) => <li>{pick(i, locale)}</li>)}
+              {svc.includes.map((i) => <li>{pick(i, locale)}</li>)}
             </ul>
           </div>
         )}
@@ -58,7 +56,7 @@ const titleColors = (slug: string) => slug === 'france'
               {dests.map((x) => (
                 <a class="chip" href={localize(locale, `/destinations/${x.id}`)}>
                   <span class="dcard__title chip__label">
-                    {pick(x.data.title, locale).toUpperCase().split('').map((letter, index) => (
+                    {pick(x.title, locale).toUpperCase().split('').map((letter, index) => (
                       <span class="dcard__letter" style={`--letter-color:${titleColors(x.id)[index % titleColors(x.id).length]};`}>{letter}</span>
                     ))}
                   </span>
@@ -69,7 +67,7 @@ const titleColors = (slug: string) => slug === 'france'
         )}
 
         <div class="reveal" style="margin-block-start:2rem;display:flex;flex-wrap:wrap;gap:.7rem">
-          <WhatsAppButton locale={locale} text={waText} service={entry.id} />
+          <WhatsAppButton locale={locale} text={waText} service={svc.id} />
           <a class="btn btn--ghost btn--lg" href="#devis"><Fragment set:html={icon('pen')} /> {t(locale, 'cta.quote')}</a>
         </div>
       </div>
@@ -83,12 +81,12 @@ const titleColors = (slug: string) => slug === 'france'
         {related.map((s, i) => (
           <a class="card card--link service-card reveal" data-d={String((i % 3) + 1)} href={localize(locale, `/services/${s.id}`)}>
             <span class="card__ic service-card__icon">
-              <img src={`/icons/${s.id}.png`} alt="" width="44" height="44" loading="lazy"
+              <img src={s.iconImage ?? `/icons/${s.id}.png`} alt="" width="44" height="44" loading="lazy"
                    onerror="this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display='grid'" />
-              <span class="ic-svg" style="display:none"><Fragment set:html={icon(s.data.icon)} /></span>
+              <span class="ic-svg" style="display:none"><Fragment set:html={icon(s.icon)} /></span>
             </span>
-            <h3>{pick(s.data.title, locale)}</h3>
-            <p class="muted small" style="margin-block-start:.5rem">{pick(s.data.tagline, locale)}</p>
+            <h3>{pick(s.title, locale)}</h3>
+            <p class="muted small" style="margin-block-start:.5rem">{pick(s.tagline, locale)}</p>
             <span class="card__cta">{t(locale, 'cta.info')} →</span>
           </a>
         ))}
@@ -103,7 +101,7 @@ const titleColors = (slug: string) => slug === 'france'
         <h2 class="h-1" style="margin-block:.7rem .5rem">{t(locale, 'form.title')}</h2>
         <p style="opacity:.9">{t(locale, 'contact.lede')}</p>
       </div>
-      <div class="card--form reveal" data-d="1"><LeadForm locale={locale} service={entry.id} /></div>
+      <div class="card--form reveal" data-d="1"><LeadForm locale={locale} service={svc.id} /></div>
     </div>
   </section>
 </Base>

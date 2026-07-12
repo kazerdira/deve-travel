@@ -1,12 +1,12 @@
 ---
 import { SITE } from '../consts';
 import { type Locale, t, pick, localize } from '../i18n/ui';
-import { getCollection } from 'astro:content';
+import { getServices, getDestinations } from '../lib/content';
 import CamelDivider from './CamelDivider.astro';
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
-const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order).slice(0, 6);
-const dests = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
+const services = (await getServices({ availableOnly: true })).slice(0, 6);
+const dests = await getDestinations();
 const year = new Date().getFullYear();
 const brandParts = SITE.name.split(' ');
 ---
@@ -21,11 +21,14 @@ const brandParts = SITE.name.split(' ');
       </div>
       <div class="footer">
         <h4>{t(locale, 'footer.services')}</h4>
-        <ul>{services.map((s) => <li><a href={localize(locale, `/services/${s.id}`)}>{pick(s.data.title, locale)}</a></li>)}</ul>
+        <ul>{services.map((s) => <li><a href={localize(locale, `/services/${s.id}`)}>{pick(s.title, locale)}</a></li>)}</ul>
       </div>
       <div class="footer">
         <h4>{t(locale, 'footer.dest')}</h4>
-        <ul>{dests.map((d) => <li><a href={localize(locale, `/destinations/${d.id}`)}>{d.data.flag} {pick(d.data.title, locale)}</a></li>)}</ul>
+        <ul>
+          {dests.map((d) => <li><a href={localize(locale, `/destinations/${d.id}`)}>{d.flag} {pick(d.title, locale)}</a></li>)}
+          <li><a href={localize(locale, '/offres')}>{t(locale, 'offers.title')}</a></li>
+        </ul>
         <h4 style="margin-block-start:1.3rem">{t(locale, 'contact.follow')}</h4>
         <ul>
           <li><a href={SITE.fb} target="_blank" rel="noopener">Facebook</a></li>

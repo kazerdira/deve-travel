@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import OfferCard from '../components/OfferCard.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { type Locale, t } from '../i18n/ui';
+import { getLiveOffers } from '../lib/offers';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const offers = await getLiveOffers();
+---
+<Base locale={locale} title={t(locale, 'offers.title')} description={t(locale, 'offers.lede')}>
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="kicker">{t(locale, 'nav.offers')}</span>
+        <h1 class="h-1">{t(locale, 'offers.title')}</h1>
+        <p class="lede">{t(locale, 'offers.lede')}</p>
+      </div>
+      {offers.length > 0 ? (
+        <div class="grid grid-3">
+          {offers.map((o, i) => <OfferCard locale={locale} offer={o} delay={i} />)}
+        </div>
+      ) : (
+        <div class="reveal" style="max-width:52ch">
+          <p class="lede" style="margin-block-end:1.4rem">{t(locale, 'offers.none')}</p>
+          <WhatsAppButton locale={locale} service="offers-empty" />
+        </div>
+      )}
+    </div>
+  </section>
+</Base>

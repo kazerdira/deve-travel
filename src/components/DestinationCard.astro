@@ -1,30 +1,34 @@
 ---
 import { type Locale, t, pick, localize } from '../i18n/ui';
 import { icon } from '../lib/icons';
-interface Props { locale: Locale; entry: any; delay?: number; }
-const { locale, entry, delay = 0 } = Astro.props;
-const d = entry.data;
-const href = localize(locale, `/destinations/${entry.id}`);
-const d3 = `/destinations/${entry.id}-3d.png`;      // floating 3D landmark (transparent PNG)
-const mesh = `mesh-${entry.id}`;                     // flag-tinted gradient (france/canada/spain/portugal)
+import type { Destination } from '../lib/content';
+interface Props { locale: Locale; destination: Destination; delay?: number; }
+const { locale, destination: d, delay = 0 } = Astro.props;
+const href = localize(locale, `/destinations/${d.id}`);
+const d3 = d.image3d ?? `/destinations/${d.id}-3d.png`;   // floating 3D landmark (transparent PNG)
+// flag-tinted mesh gradient built from the destination's two flag colours
+const mesh = `background-color:#F3E7D6;background-image:` +
+  `radial-gradient(at 14% 18%, color-mix(in srgb, ${d.meshFrom} 22%, transparent) 0, transparent 55%),` +
+  `radial-gradient(at 86% 22%, color-mix(in srgb, ${d.meshTo} 26%, transparent) 0, transparent 55%),` +
+  `radial-gradient(at 50% 92%, rgba(255,255,255,.55) 0, transparent 55%)`;
 const titleText = pick(d.title, locale).toUpperCase();
 const introText = pick(d.intro, locale).replace(/\s+/g, ' ').trim();
 const summaryText = introText.length > 90 ? `${introText.slice(0, 87).trimEnd()}…` : introText;
-const titleColors = entry.id === 'france'
+const titleColors = d.id === 'france'
   ? ['#0055A4', '#FFFFFF', '#EF4135']
-  : entry.id === 'canada'
+  : d.id === 'canada'
     ? ['#D52B1E', '#FFFFFF', '#D52B1E']
-    : entry.id === 'spain'
+    : d.id === 'spain'
       ? ['#AA151B', '#F1BF00', '#AA151B']
-      : entry.id === 'portugal'
+      : d.id === 'portugal'
         ? ['#006633', '#FFFFFF', '#DA291C']
-        : ['var(--ember)', 'var(--ink)', 'var(--sun)'];
+        : [d.meshFrom, 'var(--ink)', d.meshTo];
 ---
 {d.available ? (
-  <a class={`dcard ${mesh} card--link reveal`} data-d={String((delay % 4) + 1)} href={href}>
+  <a class="dcard card--link reveal" style={mesh} data-d={String((delay % 4) + 1)} href={href}>
     <img class="dcard__art" src={d3} alt="" loading="lazy" onerror="this.remove()" />
     <div class="dcard__body">
-      <h3 class={`dcard__title dcard__title--${entry.id}`}>
+      <h3 class={`dcard__title dcard__title--${d.id}`}>
         {titleText.split('').map((letter, index) => (
           <span class="dcard__letter" style={`--letter-color:${titleColors[index % titleColors.length]};`}>
             {letter}
@@ -36,10 +40,10 @@ const titleColors = entry.id === 'france'
     </div>
   </a>
 ) : (
-  <div class={`dcard ${mesh} dcard--soon reveal`} data-d={String((delay % 4) + 1)}>
+  <div class="dcard dcard--soon reveal" style={mesh} data-d={String((delay % 4) + 1)}>
     <div class="dcard__body">
       <div class="dcard__soon-ic"><Fragment set:html={icon('plane')} /></div>
-      <h3 class={`dcard__title dcard__title--${entry.id}`}>
+      <h3 class={`dcard__title dcard__title--${d.id}`}>
         {titleText.split('').map((letter, index) => (
           <span class="dcard__letter" style={`--letter-color:${titleColors[index % titleColors.length]};`}>
             {letter}

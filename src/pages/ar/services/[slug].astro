@@ -1,7 +1,7 @@
 ---
 import ServiceDetail from '../../../views/ServiceDetail.astro';
-import { getEntry } from 'astro:content';
+import { getService } from '../../../lib/content';
 const { slug } = Astro.params;
-if (!(await getEntry('services', slug!))) return new Response(null, { status: 404 });
+if (!(await getService(slug!))) return new Response(null, { status: 404 });
 ---
 <ServiceDetail locale="ar" slug={slug!} />

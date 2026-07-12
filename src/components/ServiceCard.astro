@@ -1,19 +1,19 @@
 ---
 import { type Locale, t, pick, localize } from '../i18n/ui';
 import { icon } from '../lib/icons';
-interface Props { locale: Locale; entry: any; delay?: number; }
-const { locale, entry, delay = 0 } = Astro.props;
-const d = entry.data;
-const href = localize(locale, `/services/${entry.id}`);
-const icon3d = `/icons/${entry.id}.png`;   // 3D icon (transparent PNG), named after the service slug
+import type { Service } from '../lib/content';
+interface Props { locale: Locale; service: Service; delay?: number; }
+const { locale, service: s, delay = 0 } = Astro.props;
+const href = localize(locale, `/services/${s.id}`);
+const icon3d = s.iconImage ?? `/icons/${s.id}.png`;   // 3D icon (transparent PNG), uploaded or named after the slug
 ---
 <a class="card card--link service-card reveal" data-d={String((delay % 4) + 1)} href={href}>
   <span class="card__ic service-card__icon">
     <img src={icon3d} alt="" width="44" height="44" loading="lazy"
          onerror="this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display='grid'" />
-    <span class="ic-svg" style="display:none"><Fragment set:html={icon(d.icon)} /></span>
+    <span class="ic-svg" style="display:none"><Fragment set:html={icon(s.icon)} /></span>
   </span>
-  <h3>{pick(d.title, locale)}</h3>
-  <p class="muted small" style="margin-block-start:.5rem">{pick(d.tagline, locale)}</p>
+  <h3>{pick(s.title, locale)}</h3>
+  <p class="muted small" style="margin-block-start:.5rem">{pick(s.tagline, locale)}</p>
   <span class="card__cta">{t(locale, 'cta.info')} →</span>
 </a>

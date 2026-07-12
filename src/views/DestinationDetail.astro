@@ -3,20 +3,19 @@ import Base from '../layouts/Base.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import LeadForm from '../components/LeadForm.astro';
 import Testimonials from '../components/Testimonials.astro';
+import OfferCard from '../components/OfferCard.astro';
 import { type Locale, t, pick, localize } from '../i18n/ui';
 import { icon } from '../lib/icons';
-import { getCollection, getEntry } from 'astro:content';
+import { getDestination, getLiveOffers } from '../lib/content';
 interface Props { locale: Locale; slug: string; }
 const { locale, slug } = Astro.props;
-const entry = await getEntry('destinations', slug);
-if (!entry) return Astro.redirect(localize(locale, '/destinations'), 302);
-const d = entry.data;
+const d = await getDestination(slug);
+if (!d) return Astro.redirect(localize(locale, '/destinations'), 302);
 const seoT = d.seo ? pick(d.seo.title, locale) : pick(d.title, locale);
 const seoD = d.seo ? pick(d.seo.description, locale) : pick(d.intro, locale);
-const svc = (await getCollection('services'))
-  .filter((s) => d.services.includes(s.id))
-  .sort((a, b) => d.services.indexOf(a.id) - d.services.indexOf(b.id));
-const heroImg = `/destinations/${entry.id}-hero.webp`;   // wide destination photo (city/landmark)
+const svc = d.services;
+const offers = await getLiveOffers({ destinationId: d.id });
+const heroImg = d.imageHero ?? `/destinations/${d.id}-hero.webp`;   // wide destination photo (city/landmark)
 ---
 <Base locale={locale} title={seoT} description={seoD} noindex={!d.available}>
   <section class="section" style="padding-block-start:clamp(1.5rem,4vw,2.5rem)">
@@ -50,7 +49,7 @@ const heroImg = `/destinations/${entry.id}-hero.webp`;   // wide destination pho
               </div>
             )}
             <div class="reveal" style="margin-block-start:2rem;display:flex;flex-wrap:wrap;gap:.7rem">
-              <WhatsAppButton locale={locale} destination={entry.id} service="dest-hero" />
+              <WhatsAppButton locale={locale} destination={d.id} service="dest-hero" />
               <a class="btn btn--ghost btn--lg" href="#devis"><Fragment set:html={icon('pen')} /> {t(locale, 'cta.quote')}</a>
             </div>
           </>
@@ -61,6 +60,17 @@ const heroImg = `/destinations/${entry.id}-hero.webp`;   // wide destination pho
     </div>
   </section>
 
+  {offers.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <div class="section-head reveal"><h2 class="h-2">{t(locale, 'offers.title')}</h2></div>
+        <div class="grid grid-3">
+          {offers.map((o, i) => <OfferCard locale={locale} offer={o} delay={i} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
   {d.available && svc.length > 0 && (
     <section class="section section--sand">
       <div class="container">
@@ -69,12 +79,12 @@ const heroImg = `/destinations/${entry.id}-hero.webp`;   // wide destination pho
           {svc.map((s, i) => (
             <a class="card card--link service-card reveal" data-d={String((i % 3) + 1)} href={localize(locale, `/services/${s.id}`)}>
               <span class="card__ic service-card__icon">
-                <img src={`/icons/${s.id}.png`} alt="" width="44" height="44" loading="lazy"
+                <img src={s.iconImage ?? `/icons/${s.id}.png`} alt="" width="44" height="44" loading="lazy"
                      onerror="this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display='grid'" />
-                <span class="ic-svg" style="display:none"><Fragment set:html={icon(s.data.icon)} /></span>
+                <span class="ic-svg" style="display:none"><Fragment set:html={icon(s.icon)} /></span>
               </span>
-              <h3>{pick(s.data.title, locale)}</h3>
-              <p class="muted small" style="margin-block-start:.5rem">{pick(s.data.tagline, locale)}</p>
+              <h3>{pick(s.title, locale)}</h3>
+              <p class="muted small" style="margin-block-start:.5rem">{pick(s.tagline, locale)}</p>
               <span class="card__cta">{t(locale, 'cta.info')} →</span>
             </a>
           ))}
@@ -84,7 +94,7 @@ const heroImg = `/destinations/${entry.id}-hero.webp`;   // wide destination pho
   )}
 
   {d.available && (
-    <section class="section"><div class="container"><Testimonials locale={locale} destination={entry.id} /></div></section>
+    <section class="section"><div class="container"><Testimonials locale={locale} destination={d.id} /></div></section>
   )}
 
   <section class="section section--dusk" id="devis">
@@ -94,7 +104,7 @@ const heroImg = `/destinations/${entry.id}-hero.webp`;   // wide destination pho
         <h2 class="h-1" style="margin-block:.7rem .5rem">{t(locale, 'form.title')}</h2>
         <p style="opacity:.9">{t(locale, 'contact.lede')}</p>
       </div>
-      <div class="card--form reveal" data-d="1"><LeadForm locale={locale} destination={entry.id} /></div>
+      <div class="card--form reveal" data-d="1"><LeadForm locale={locale} destination={d.id} /></div>
     </div>
   </section>
 </Base>

@@ -332,3 +332,27 @@ body{padding-block-end:78px}
 .stats-panel{background:rgba(255,251,245,.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border:1px solid rgba(255,255,255,.6);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);
   padding:clamp(1.4rem,3vw,2rem)}
+
+/* ============================================================
+   OFFERS — homepage banner strip + offer cards (v2)
+   ============================================================ */
+.offer-banner{background:var(--sunset);color:#fff;border-block:1px solid rgba(255,255,255,.08);padding-block:.8rem}
+.offer-banner__in{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.offer-banner__main{display:inline-flex;align-items:center;gap:.8rem;flex-wrap:wrap;color:#fff;min-width:0}
+.offer-banner__main:hover .offer-banner__title{text-decoration:underline}
+.offer-banner__flag{font-size:1.5rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
+.offer-banner__title{font-family:var(--font-display);font-weight:700;font-size:1.08rem;color:#fff}
+[dir="rtl"] .offer-banner__title{font-family:var(--font-ar)}
+.offer-banner__urgency{font-family:var(--font-ui);font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
+[dir="rtl"] .offer-banner__urgency{font-family:var(--font-ar);letter-spacing:0}
+.offer-banner__cta{margin-inline-start:auto;min-height:42px;padding-inline:1.1rem}
+@media(max-width:700px){.offer-banner__cta{margin-inline-start:0}}
+
+.ocard{padding:0;overflow:hidden}
+.ocard__img{position:relative;aspect-ratio:16/9;background:var(--sunset) center/cover no-repeat}
+.ocard__flag{position:absolute;inset-block-start:.8rem;inset-inline-start:.8rem;font-size:1.6rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
+.ocard__body{padding:1.3rem 1.4rem 1.5rem;display:flex;flex-direction:column;gap:.45rem;flex:1}
+.ocard__body h3{font-size:1.3rem}
+.ocard__body p{margin:0}
+.ocard__urgency{font-family:var(--font-ui);font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ember)}
+[dir="rtl"] .ocard__urgency{font-family:var(--font-ar);letter-spacing:0}

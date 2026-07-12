@@ -1,0 +1,7 @@
+---
+import OfferDetail from '../../../views/OfferDetail.astro';
+import { getOffer } from '../../../lib/offers';
+const { slug } = Astro.params;
+if (!(await getOffer(slug!))) return new Response(null, { status: 404 });
+---
+<OfferDetail locale="ar" slug={slug!} />

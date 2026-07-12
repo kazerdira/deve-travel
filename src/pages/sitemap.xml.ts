@@ -1,18 +1,20 @@
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
+import { getServices, getDestinations, getLiveOffers } from '../lib/content';
 import { SITE } from '../consts';
 
 export const prerender = false;
 
 export const GET: APIRoute = async () => {
   const base = SITE.url.replace(/\/$/, '');
-  const services = await getCollection('services');
-  const dests = (await getCollection('destinations')).filter((d) => d.data.available);
-  const staticPaths = ['/', '/services', '/destinations', '/processus', '/a-propos', '/contact'];
+  const services = await getServices({ availableOnly: true });
+  const dests = await getDestinations({ availableOnly: true });
+  const offers = await getLiveOffers();
+  const staticPaths = ['/', '/services', '/destinations', '/offres', '/processus', '/a-propos', '/contact'];
   const paths = [
     ...staticPaths,
     ...services.map((s) => `/services/${s.id}`),
     ...dests.map((d) => `/destinations/${d.id}`),
+    ...offers.map((o) => `/offres/${o.slug}`),
   ];
   const urls = paths.flatMap((p) => [p, p === '/' ? '/ar' : `/ar${p}`]);
   const body = `<?xml version="1.0" encoding="UTF-8"?>

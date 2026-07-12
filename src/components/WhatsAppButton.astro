@@ -4,13 +4,13 @@ import { waUrl } from '../lib/wa';
 import { icon } from '../lib/icons';
 interface Props {
   locale: Locale; text?: string; label?: string;
-  service?: string; destination?: string; block?: boolean; ghost?: boolean; lg?: boolean;
+  service?: string; destination?: string; offer?: string; block?: boolean; ghost?: boolean; lg?: boolean;
 }
-const { locale, text, label, service, destination, block = false, ghost = false, lg = true } = Astro.props;
+const { locale, text, label, service, destination, offer, block = false, ghost = false, lg = true } = Astro.props;
 const href = waUrl(text ?? t(locale, 'cta.whatsapp'));
 const cls = ['btn', ghost ? 'btn--ghost' : 'btn--wa', block ? 'btn--block' : '', lg ? 'btn--lg' : ''].join(' ');
 ---
-<a class={cls} href={href} target="_blank" rel="noopener" data-wa data-service={service} data-destination={destination}>
+<a class={cls} href={href} target="_blank" rel="noopener" data-wa data-service={service} data-destination={destination} data-offer={offer}>
   <Fragment set:html={icon('whatsapp')} />
   {label ?? t(locale, 'cta.whatsapp')}
 </a>

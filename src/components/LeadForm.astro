@@ -1,10 +1,10 @@
 ---
 import { type Locale, t, pick } from '../i18n/ui';
-import { getCollection } from 'astro:content';
-interface Props { locale: Locale; service?: string; destination?: string; compact?: boolean; }
-const { locale, service = '', destination = '', compact = false } = Astro.props;
-const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
-const dests = (await getCollection('destinations')).filter((d) => d.data.available).sort((a, b) => a.data.order - b.data.order);
+import { getServices, getDestinations } from '../lib/content';
+interface Props { locale: Locale; service?: string; destination?: string; offer?: string; compact?: boolean; }
+const { locale, service = '', destination = '', offer = '', compact = false } = Astro.props;
+const services = await getServices({ availableOnly: true });
+const dests = await getDestinations({ availableOnly: true });
 const okMsg = t(locale, 'form.ok');
 const errMsg = t(locale, 'form.err');
 const sending = t(locale, 'form.sending');
@@ -28,14 +28,14 @@ const submitLabel = t(locale, 'form.submit');
         <label for="lf-dest">{t(locale, 'form.dest')}</label>
         <select id="lf-dest" name="destination">
           <option value="">{t(locale, 'form.choose')}</option>
-          {dests.map((d) => <option value={d.id} selected={d.id === destination}>{pick(d.data.title, locale)}</option>)}
+          {dests.map((d) => <option value={d.id} selected={d.id === destination}>{pick(d.title, locale)}</option>)}
         </select>
       </div>
       <div class="field">
         <label for="lf-service">{t(locale, 'form.service')}</label>
         <select id="lf-service" name="service">
           <option value="">{t(locale, 'form.choose')}</option>
-          {services.map((s) => <option value={s.id} selected={s.id === service}>{pick(s.data.title, locale)}</option>)}
+          {services.map((s) => <option value={s.id} selected={s.id === service}>{pick(s.title, locale)}</option>)}
         </select>
       </div>
     </div>
@@ -55,6 +55,7 @@ const submitLabel = t(locale, 'form.submit');
   </div>
   {compact && <input type="hidden" name="destination" value={destination} />}
   {compact && <input type="hidden" name="service" value={service} />}
+  {offer && <input type="hidden" name="offer_slug" value={offer} />}
   <div class="form__hp" aria-hidden="true">
     <label>Ne pas remplir<input type="text" name="company" tabindex="-1" autocomplete="off" /></label>
   </div>

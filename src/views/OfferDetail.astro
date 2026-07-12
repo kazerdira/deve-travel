@@ -1,0 +1,65 @@
+---
+import Base from '../layouts/Base.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import LeadForm from '../components/LeadForm.astro';
+import { type Locale, t, pick, localize } from '../i18n/ui';
+import { getOffer, urgency } from '../lib/offers';
+interface Props { locale: Locale; slug: string; }
+const { locale, slug } = Astro.props;
+const offer = await getOffer(slug);
+if (!offer) return Astro.redirect(localize(locale, '/offres'), 302);
+const line = urgency(offer, locale);
+const body = pick(offer.body, locale);
+const paragraphs = body ? body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean) : [];
+const waText = pick(offer.whatsapp, locale) || pick(offer.title, locale);
+---
+<Base locale={locale} title={pick(offer.title, locale)} description={pick(offer.summary, locale)}>
+  <section class="section" style="padding-block-start:clamp(1.5rem,4vw,2.5rem)">
+    <div class="container">
+      <div class="breadcrumb reveal">
+        <a href={localize(locale, '/offres')}>{t(locale, 'offers.title')}</a> / <span>{pick(offer.title, locale)}</span>
+      </div>
+      {offer.image && (
+        <div class="dhero reveal">
+          <div class="dhero__img" style={`background-image:url('${offer.image}')`}></div>
+          <div class="dhero__scrim"></div>
+          <div class="dhero__in">
+            <h1 class="h-1">{offer.flag} {pick(offer.title, locale)}</h1>
+            <p class="lede" style="margin-block-start:.6rem;color:rgba(255,255,255,.92)">{pick(offer.summary, locale)}</p>
+          </div>
+        </div>
+      )}
+      <div style="max-width:62ch">
+        {!offer.image && (
+          <>
+            {offer.countryLabel && <span class="kicker reveal">{offer.countryLabel}</span>}
+            <h1 class="h-1 reveal" style="margin-block:1rem .5rem">{offer.flag} {pick(offer.title, locale)}</h1>
+            <p class="lede reveal">{pick(offer.summary, locale)}</p>
+          </>
+        )}
+        {line && <p class="ocard__urgency reveal" style="margin-block-start:1.2rem">{line}</p>}
+        {paragraphs.length > 0 && (
+          <div class="prose reveal" style="margin-block-start:1.4rem">
+            {paragraphs.map((p) => <p>{p}</p>)}
+          </div>
+        )}
+        <div class="reveal" style="margin-block-start:2rem;display:flex;flex-wrap:wrap;gap:.7rem">
+          <WhatsAppButton locale={locale} text={waText} label={t(locale, 'offers.interested')} service="offer" offer={offer.slug} destination={offer.destinationId ?? undefined} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--dusk" id="devis">
+    <div class="container" style="display:grid;gap:2rem;max-width:700px">
+      <div class="reveal">
+        <span class="kicker">{t(locale, 'cta.quote')}</span>
+        <h2 class="h-1" style="margin-block:.7rem .5rem">{t(locale, 'form.title')}</h2>
+        <p style="opacity:.9">{t(locale, 'contact.lede')}</p>
+      </div>
+      <div class="card--form reveal" data-d="1">
+        <LeadForm locale={locale} destination={offer.destinationId ?? ''} offer={offer.slug} />
+      </div>
+    </div>
+  </section>
+</Base>

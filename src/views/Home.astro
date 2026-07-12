@@ -9,14 +9,15 @@ import ProcessSteps from '../components/ProcessSteps.astro';
 import Testimonials from '../components/Testimonials.astro';
 import LeadForm from '../components/LeadForm.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
+import OfferBanner from '../components/OfferBanner.astro';
 import { type Locale, t } from '../i18n/ui';
 import { icon } from '../lib/icons';
-import { getCollection } from 'astro:content';
+import { getServices, getDestinations } from '../lib/content';
 import { SITE } from '../consts';
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
-const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
-const dests = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
+const services = await getServices({ availableOnly: true });
+const dests = await getDestinations();
 ---
 <Base locale={locale} title={t(locale, 'brand.tag')} description={t(locale, 'home.hero.lede')}>
   <Hero locale={locale} />
@@ -34,6 +35,8 @@ const dests = (await getCollection('destinations')).sort((a, b) => a.data.order 
     </div>
   </section>
 
+  <OfferBanner locale={locale} />
+
   <!-- DESTINATIONS -->
   <section class="section section--sand">
     <div class="container">
@@ -43,7 +46,7 @@ const dests = (await getCollection('destinations')).sort((a, b) => a.data.order 
         <p class="lede">{t(locale, 'home.dest.lede')}</p>
       </div>
       <div class="grid grid-4">
-        {dests.map((d, i) => <DestinationCard locale={locale} entry={d} delay={i} />)}
+        {dests.map((d, i) => <DestinationCard locale={locale} destination={d} delay={i} />)}
       </div>
     </div>
   </section>
@@ -57,7 +60,7 @@ const dests = (await getCollection('destinations')).sort((a, b) => a.data.order 
         <p class="lede">{t(locale, 'home.services.lede')}</p>
       </div>
       <div class="grid grid-4">
-        {services.map((s, i) => <ServiceCard locale={locale} entry={s} delay={i} />)}
+        {services.map((s, i) => <ServiceCard locale={locale} service={s} delay={i} />)}
       </div>
     </div>
   </section>

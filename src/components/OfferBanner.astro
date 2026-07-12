@@ -1,0 +1,27 @@
+---
+// Slim homepage strip for the featured live offer. Renders nothing when there
+// is no live featured offer — expiry is enforced by the SSR query itself.
+import { type Locale, t, pick, localize } from '../i18n/ui';
+import { getLiveOffers, urgency } from '../lib/offers';
+import { waUrl } from '../lib/wa';
+import { icon } from '../lib/icons';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const [offer] = await getLiveOffers({ featured: true, limit: 1 });
+const line = offer ? urgency(offer, locale) : null;
+---
+{offer && (
+  <aside class="offer-banner">
+    <div class="container offer-banner__in">
+      <a class="offer-banner__main" href={localize(locale, `/offres/${offer.slug}`)}>
+        <span class="offer-banner__flag">{offer.flag}</span>
+        <span class="offer-banner__title">{pick(offer.title, locale)}</span>
+        {line && <span class="offer-banner__urgency">{line}</span>}
+      </a>
+      <a class="btn btn--wa offer-banner__cta" href={waUrl(pick(offer.whatsapp, locale) || pick(offer.title, locale))}
+         target="_blank" rel="noopener" data-wa data-offer={offer.slug} data-service="offer-banner">
+        <Fragment set:html={icon('whatsapp')} /> {t(locale, 'offers.interested')}
+      </a>
+    </div>
+  </aside>
+)}
