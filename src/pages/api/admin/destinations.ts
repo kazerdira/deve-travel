@@ -5,7 +5,7 @@ import { SLUG_RE, str, opt, bool, int, lines, backOk, backErr } from '../../../l
 
 export const prerender = false;
 const LIST = '/admin/destinations';
-const TRACK_KEYS = ['student', 'worker', 'pr'] as const;
+const TRACK_KEYS = ['student', 'worker', 'pr', 'tourist'] as const;
 
 const schema = z.object({
   sort_order: z.number().int(),

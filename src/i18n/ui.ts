@@ -74,6 +74,7 @@ const S = {
   'aud.student':        { fr: 'Étudiant', ar: 'طالب' },
   'aud.worker':         { fr: 'Travailleur', ar: 'عامل' },
   'aud.pr':             { fr: 'Résidence / Immigration', ar: 'إقامة / هجرة' },
+  'aud.tourist':        { fr: 'Touriste', ar: 'سائح' },
   'footer.services':    { fr: 'Services', ar: 'الخدمات' },
   'footer.dest':        { fr: 'Destinations', ar: 'الوجهات' },
   'footer.rights':      { fr: 'Tous droits réservés.', ar: 'جميع الحقوق محفوظة.' },

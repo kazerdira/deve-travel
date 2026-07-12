@@ -14,7 +14,7 @@ const schema = z.object({
   email: z.string().email().max(160).optional().or(z.literal('')),
   destination: z.string().max(40).optional().or(z.literal('')),
   service: z.string().max(40).optional().or(z.literal('')),
-  audience: z.enum(['student', 'worker', 'pr']).optional().or(z.literal('')),
+  audience: z.enum(['student', 'worker', 'pr', 'tourist']).optional().or(z.literal('')),
   message: z.string().max(2000).optional().or(z.literal('')),
   offer_slug: z.string().max(60).optional().or(z.literal('')),
   locale: z.enum(['fr', 'ar']).default('fr'),
