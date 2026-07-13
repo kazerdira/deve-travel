@@ -419,3 +419,76 @@ body{padding-block-end:78px}
 .upload-row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
 .upload-row img{width:54px;height:54px;object-fit:contain;background:var(--sand-2);border-radius:8px;border:1px solid var(--line)}
 .login-card{max-width:380px;margin:12vh auto;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:2rem;display:grid;gap:1rem}
+
+/* ============================================================
+   MOBILE — 2-col grids, compact cards, small sticky CTA (v2)
+   Everything below only kicks in on narrow viewports.
+   ============================================================ */
+@media (max-width: 620px) {
+  /* tighter section rhythm on small screens */
+  .section{padding-block:clamp(2rem,7vw,3rem)}
+  .section-head{margin-block-end:1.1rem}
+
+  /* every content grid: 2 columns on mobile with a snug gap */
+  .grid{gap:.7rem}
+  .grid-3, .grid-4{grid-template-columns:repeat(2,1fr)}
+
+  /* generic card: less padding, smaller type */
+  .card{padding:.9rem;border-radius:14px}
+  .card h3{font-size:.98rem;line-height:1.15}
+  .card__cta{font-size:.78rem;padding-block-start:.6rem}
+  .card p.small, .card .muted{font-size:.76rem;line-height:1.35}
+
+  /* service cards: icons a touch bigger relative to the smaller card */
+  .service-card .card__ic, .service-card__icon{width:74px;height:74px;margin-block-end:.55rem}
+  .service-card .card__ic img, .service-card__icon img{width:60px;height:60px}
+  .service-card .card__ic svg, .service-card__icon svg{width:32px;height:32px}
+
+  /* destination cards: compact tile, 3D landmark reined in */
+  .dcard{min-height:210px;padding:.85rem}
+  .dcard__art{width:64%;max-width:150px;inset-block-start:-6%;inset-inline-end:-8%}
+  [dir="rtl"] .dcard__art{inset-inline-end:auto;inset-inline-start:-8%}
+  .dcard__body{margin-block-start:4.6rem;padding:.2rem .3rem 0;max-width:none}
+  .dcard__title{font-size:.98rem;letter-spacing:.05em}
+  .dcard__summary{font-size:.72rem;line-height:1.35;max-width:none}
+  .dcard__cta{font-size:.78rem}
+  .dcard--soon{min-height:180px}
+  .dcard__soon-ic{width:52px;height:52px}
+  .dcard__soon-ic svg{width:24px;height:24px}
+  .badge-soon{font-size:.6rem;padding:.22rem .5rem}
+
+  /* process ticket: 2-per-row instead of a tall stack; last step spans both */
+  .ticket__row{grid-template-columns:repeat(2,1fr)}
+  .ticket__step{padding:.9rem .85rem;border-block-end:1px dashed var(--line-2)}
+  .ticket__step:nth-child(odd){border-inline-end:1px dashed var(--line-2)}
+  .ticket__step:last-child{grid-column:1/-1;border-block-end:none}
+  .ticket__step:nth-last-child(2){border-block-end:none}
+  .ticket__no{width:28px;height:28px;font-size:.8rem;margin-block-end:.5rem}
+  .ticket__step h3{font-size:.95rem;margin-block-end:.25rem}
+  .ticket__step p{font-size:.78rem;line-height:1.4}
+
+  /* testimonials: match the 2-column rhythm, softer punctuation */
+  .quote{padding:1rem}
+  .quote::before{font-size:2.6rem;inset-block-start:.15rem;inset-inline-start:.6rem}
+  .quote blockquote{font-size:.86rem;line-height:1.4}
+  .quote figcaption{font-size:.76rem;margin-block-start:.6rem}
+
+  /* offer cards inherit the compact card treatment */
+  .ocard__body{padding:.9rem 1rem 1.1rem;gap:.35rem}
+  .ocard__body h3{font-size:1.05rem}
+  .ocard__urgency{font-size:.7rem}
+
+  /* sticky bottom CTA: never overflow, no shouty text sizes */
+  .sticky-cta{padding:.45rem var(--gutter) calc(.45rem + env(safe-area-inset-bottom));gap:.45rem}
+  .sticky-cta .btn{min-width:0;min-height:44px;padding-inline:.7rem;font-size:.82rem;letter-spacing:0;
+    overflow:hidden;text-overflow:ellipsis}
+  .sticky-cta .btn svg{width:16px;height:16px;flex:none}
+  body{padding-block-end:62px}
+}
+
+/* very narrow phones (<= 380px): one more step down so the CTAs breathe */
+@media (max-width: 380px) {
+  .sticky-cta .btn{font-size:.76rem;padding-inline:.5rem}
+  .dcard{min-height:190px}
+  .dcard__body{margin-block-start:4rem}
+}
