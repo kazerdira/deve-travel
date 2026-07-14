@@ -429,6 +429,19 @@ body{padding-block-end:78px}
   .section{padding-block:clamp(2rem,7vw,3rem)}
   .section-head{margin-block-end:1.1rem}
 
+  /* buttons in page bodies are one size smaller — the sticky bar has its own */
+  .btn{min-height:44px;padding-inline:1rem;font-size:.9rem}
+  .btn--lg{min-height:46px;padding-inline:1.1rem;font-size:.92rem}
+  .btn svg{width:16px;height:16px}
+  /* the form's own submit stays a proper primary CTA */
+  .form .btn--sun.btn--block{min-height:52px;font-size:1rem}
+  /* hero + final CTA: tighter gap, and each side-by-side button shares the row */
+  .hero__cta{gap:.5rem}
+  .hero__cta .btn{flex:1 1 auto;min-width:0}
+  /* only the top block of the final CTA (WhatsApp + phone), not the form */
+  .section--dusk .container > .reveal .btn--wa,
+  .section--dusk .container > .reveal .btn--ghost{flex:1 1 auto;min-width:0}
+
   /* every content grid: 2 columns on mobile with a snug gap */
   .grid{gap:.7rem}
   .grid-3, .grid-4{grid-template-columns:repeat(2,1fr)}
